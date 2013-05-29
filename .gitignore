@@ -2,9 +2,9 @@ pom.xml
 *jar
 /lib/
 /classes/
-.lein-deps-sum
 .cake
 .idea/
-.lein-repl-history
+.lein-*
 target/
 *.iml
+.env
