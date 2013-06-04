@@ -4,7 +4,10 @@
             [noir.validation :as validate])
   (import org.bson.types.ObjectId))
 
-;; Gets
+
+(defn has-id [startup]
+  (let [id (:_id startup)]
+  (and id (not-empty id))))
 
 (let [collection "startups"]
   (defn total []
@@ -29,18 +32,22 @@
 
   (defn add! [startup]
     (when (valid? startup)
-      (let [oid (if (contains? startup :_id ) (get startup :_id ) (ObjectId.))]
+      (let [oid (if  (has-id startup) (:_id startup) (ObjectId.))]
         (if (nil? (id->startup oid))
           (get (mc/insert-and-return collection (merge startup {:_id oid})) :_id )))))
 
-  (defn edit! [startup]
+  (defn update! [startup]
     (when (valid? startup)
-      (let [oid (get startup :_id )]
-        (if (not (nil? oid))
-          (if (not (nil? (id->startup oid)))
-            (mc/update-by-id collection oid startup))))))
+      (if-let [oid (:_id startup)]
+        (if (not (nil? (id->startup oid)))
+          (do
+            (mc/update-by-id collection oid startup)
+            oid)))))
 
   (defn remove! [id]
     (mc/remove-by-id collection id))
+
+  (defn remove-website! [website]
+    (mc/remove collection {:website website}))
 
   )

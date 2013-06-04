@@ -44,12 +44,17 @@
     (startup/add! github)
     (is (= 3 (startup/total))))
 
-  (deftest edit!
-    (startup/edit! (merge google {:website "www.new.com"}))
-    (is (= "www.new.com" (get (startup/id->startup google-id) :website))))
+  (deftest update!
+    (is (= google-id (startup/update! (merge google {:website "www.new.com"}))))
+    (is (= "www.new.com" (get (startup/id->startup google-id) :website ))))
 
   (deftest remove!
     (startup/remove! google-id)
+    (is (= 1 (startup/total)))
+    (is (= nil (startup/id->startup google-id))))
+
+  (deftest remove-website!
+    (startup/remove-website! "www.google.com")
     (is (= 1 (startup/total)))
     (is (= nil (startup/id->startup google-id))))
 

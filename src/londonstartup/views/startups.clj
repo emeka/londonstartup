@@ -10,45 +10,73 @@
         hiccup.element
         hiccup.page
         hiccup.form
-        ))
+        )
+  (import org.bson.types.ObjectId))
 
+
+;; Page Elements
 (defpartial error-text [errors]
   [:span (string/join "" errors)])
 
-(defpartial startup-fields [{:keys [website name]}]
+(defpartial startup-form-field [{:keys [website name _id]}]
   (validate/on-error :name error-text)
   (text-field {:placeholder "Name"} :name name)
   (validate/on-error :website error-text)
   (text-field {:placeholder "Website"} :website website)
+  (hidden-field :_id _id)
   )
+
+(defpartial startup-form [action method url startup]
+  (form-to [method url]
+    [:ul.actions [:li (link-to {:class "submit"} "/" action)]]
+    (startup-form-field startup)
+    (submit-button {:class "submit"} action)))
+
+(defpartial startup-remove-form [{:keys [website]}]
+  (when website
+    (form-to [:delete (url-for startup-remove {:website website})]
+      (submit-button {:class "submit"} "Delete"))))
 
 (defpartial startup-item [{:keys [website name] :as startup}]
   (when startup
-    [:li [:dl [:dt name]
-          [:dd [:ul [:li website]]]]]))
+    [:dl [:dt "Company Name:"]
+     [:dd (link-to (url-for startup {:website website}) name)]
+     (startup-remove-form startup)
+     [:dt "Website:"]
+     [:dd website]]))
 
-(defpartial startup-list [startups]
+;; Pages
+(defpartial startup-page [{:keys [website] :as startup}]
   (common/layout
-    [:ul (map startup-item startups)]))
+    [:div (startup-item startup)]
+    [:div (startup-form "Update" :put (url-for startup-update {:_website website}) startup)]))
 
-(defpage "/startups" []
-  (startup-list (startup/startups))
-  )
-
-(defpage "/startup/:website" {:keys [website]}
-  (startup-item (startup/website->startup website))
-  )
-
-(defpage "/add/startup" {:as startup}
+(defpartial startups-page [startups]
   (common/layout
-    (form-to [:post "/add/startup"]
-      [:ul.actions [:li (link-to {:class "submit"} "/" "Add")]]
-      (startup-fields startup)
-      (submit-button {:class "submit"} "add startup"))))
+    (startup-form "Add" :post (url-for startup-new) {})
+    [:ul (map #(conj [:li ] (startup-item %)) startups)]))
 
-(defpage [:post "/add/startup"] {:keys [name website] :as new-startup}
+;; Routing
+(defpage startups "/startups" []
+  (startups-page (startup/startups)))
+
+(defpage startup "/startup/:website" {:keys [website]}
+  (startup-page (startup/website->startup website)))
+
+(defpage startup-new [:post "/startups"] {:keys [website] :as new-startup}
   (if (startup/add! new-startup)
-    (resp/redirect (url-for "/startup/:website" {:website (get new-startup :website)}))
-    (render "/add/startup" new-startup)
+    (resp/redirect (url-for "/startup/:website" {:website website}))
+    (render startups)
+    ))
+
+(defpage startup-update [:put "/startup/:_website"] {:keys [website _id] :as updated-startup}
+  ;;(str updated-startup website _id)
+  (if (startup/update! (dissoc (merge updated-startup {:_id (ObjectId. _id)}) :_method, :_website))
+    (resp/redirect (url-for "/startup/:website" {:website website}))
+    (render startup updated-startup)
     )
   )
+
+(defpage startup-remove [:delete "/startup/:website"] {:keys [website]}
+  (startup/remove-website! website)
+  (resp/redirect (url-for "/startups")))
