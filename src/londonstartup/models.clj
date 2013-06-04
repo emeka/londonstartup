@@ -3,5 +3,5 @@
 
 
 (defn initialize []
-  (let [uri (get (System/getenv) "MONGODB_URI" "mongodb://127.0.0.1/londonstartup")]
+  (let [uri (get (System/getenv) "MONGOLAB_URI" "mongodb://127.0.0.1/londonstartup")]
     (monger.core/connect-via-uri! uri)))
