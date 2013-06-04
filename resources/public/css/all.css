@@ -1,0 +1,371 @@
+body {
+	margin:0;
+	color:#8c8c8c;
+	font:12px/15px 'Helvetica', Arial, sans-serif;
+	background:#fff;
+	min-width:1000px;
+}
+img {border-style:none;}
+a {
+	text-decoration:none;
+	color:#000;
+}
+a:hover {text-decoration:underline;}
+input, textarea, select {
+	font:100% 'Helvetica', Arial, sans-serif;
+	vertical-align:middle;
+	color:#000;
+}
+form, fieldset {
+	margin:0;
+	padding:0;
+	border-style:none;
+}
+q, blockquote {
+    content: "";
+    quotes: none;
+}
+#header {
+	overflow:hidden;
+}
+.topbar {
+	overflow:hidden;
+	padding:10px 0 13px 0;
+}
+.erlangjobs .topbar {
+	background:#c94c38;
+}
+.lispjobs .topbar {
+	background:#1f7ec1;
+}
+.schemejobs .topbar {
+	background:#f99f56;
+}
+.clojurejobs .topbar {
+	background:#50a326;
+}
+.topbar .holder {
+	width:960px;
+	margin:0 auto;
+	overflow:hidden;
+}
+.logo {
+	background:url(../images/erlangjobs.png) no-repeat;
+	width:198px;
+	height:38px;
+	text-indent:-9999px;
+	overflow:hidden;
+	margin:10px 0 0 1px;
+	float:left;
+}
+.logo a {
+	height:100%;
+	display:block;
+}
+.erlangjobs .logo {background:url(../images/erlangjobs.png) no-repeat;}
+.lispjobs .logo {
+	background:url(../images/lispjobs.png) no-repeat;
+	width:132px;
+}
+.schemejobs .logo {
+	background:url(../images/schemejobs.png) no-repeat;
+	width:195px;
+}
+.clojurejobs .logo{
+	background:url(../images/clojurejobs.gif) no-repeat;
+	width:203px;
+}
+.topbar .info {
+	float:right;
+	margin:2px 0 0 0;
+	text-align:right;
+}
+.topbar .call {
+	font-size:32px;
+	line-height:35px;
+	display:block;
+	color:#fff;
+	letter-spacing:-2px;
+}
+.topbar .email {
+	color:#fff;
+	font:16px/19px Georgia, "Times New Roman", Times, serif;
+}
+.banner {overflow:hidden;}
+.erlangjobs .banner {background:#eee9e6;}
+.lispjobs .banner {background:#eeece1;}
+.schemejobs .banner {background:#eeeae3;}
+.clojurejobs .banner {background:#eaeee7;}
+.banner .holder {
+	margin:0 auto;
+	width:960px;
+	padding:47px 0 0 0;
+}
+.banner .text {
+	float:left;
+	position:relative;
+	z-index:100;
+	width:500px;
+	color:#71706e;
+	font-size:18px;
+	line-height:28px;
+}
+.banner h2 {
+	font-size:78px;
+	line-height:78px;
+	letter-spacing:-5px;
+	color:#fff;
+	font-weight:normal;
+	margin:0 0 37px -27px;
+	width:635px;
+	overflow:hidden;
+}
+.banner h2 strong {
+	padding:0 29px 15px 22px;
+	float:left;
+	margin:-16px 0 0 0;
+	background:#383838;
+}
+.banner h2 strong:first-child {
+	padding:18px 27px 22px 22px;
+	margin:0;
+}
+.banner p {
+	margin:0 0 43px 0;
+}
+.banner .btn-area {
+	overflow:hidden;
+	padding:0 0 33px 0;
+}
+.post-btn {
+	color:#fff;
+	font-size:31px;
+	line-height:62px;
+	padding:4px 20px 0px;
+	letter-spacing:-1px;
+	float:left;
+	font-weight:bold;
+}
+.erlangjobs .post-btn {background:#c94c38;}
+.lispjobs .post-btn {background:#1f7ec1;}
+.schemejobs .post-btn {background:#ee9852;}
+.clojurejobs .post-btn {background:#50a326;}
+.post-btn:hover {
+	background: #383838;
+	text-decoration: none;
+}
+.banner .b-text {
+	float:left;
+	margin:24px 0 0 14px;
+	color:#b0afa6;
+	font:italic 20px/24px Georgia, "Times New Roman", Times, serif;
+}
+.banner .b-link {
+	color:#a09f98;
+	margin:0 0 0 4px;
+	letter-spacing:-1px;
+	font:bold 22px/25px 'Helvetica', Arial, sans-serif;
+}
+.banner .term-text {
+	color:#9d9c99;
+	font-size:13px;
+	line-height:16px;
+	display:block;
+}
+.banner .chart {
+	float:right;
+	width:458px;
+	position:relative;
+	padding:90px 0 0 0;
+}
+.banner .text-1, .banner .text-2 {
+	color:#b8b7af;
+	font-size:36px;
+	line-height:39px;
+	position:absolute;
+	left:131px;
+	top:50px;
+	cursor: default;
+}
+.banner .text-2 {left:275px;}
+.erlangjobs .banner .text-1 {color:#c94c38;}
+.lispjobs .banner .text-1 {color:#1f7ec1;}
+.schemejobs .banner .text-1 {color:#f99f56;}
+.erlangjobs .banner .text-2 {color:#b8b7af;}
+.lispjobs .banner .text-2 {color:#b8b7af;}
+.schemejobs .banner .text-2 {color:#bcb5ac;}
+.clojurejobs .banner .text-1 {color:#50a326;}
+.clojurejobs .banner .text-2 {color:#bfc2bc;}
+#main {
+	width:960px;
+	margin:0 auto;
+}
+.brands {
+	margin:0;
+	padding:47px 0 40px 0;
+	list-style:none;
+	overflow:hidden;
+	border-bottom:1px solid #e0dfd5;
+}
+.brands li {
+	float:left;
+	margin:0 0 0 25px;
+}
+.brands li:first-child {
+	margin:0;
+}
+.features {
+	width:100%;
+	font-size:28px;
+	line-height:38px;
+	padding:33px 0;
+	border-bottom:1px solid #e0dfd5;
+}
+.features-last {
+	padding-bottom:45px;
+}
+.features .head {
+	padding:0 0 28px 0;
+	width:105%;
+}
+.features h3 {
+	float:left;
+	font-size:48px;
+	line-height:52px;
+	color:#c94c38;
+	margin:0;
+	letter-spacing:-2px;
+}
+.erlangjobs .features h3 {color:#c94c38;}
+.lispjobs .features h3 {color:#1f7ec1;}
+.schemejobs .features h3 {color:#ee9852;}
+.clojurejobs .features h3 {color:#50a326;}
+.features .f-text {
+	float:left;
+	color:#787878;
+	font-size:18px;
+	margin:0 16px 0 29px;
+	line-height:48px;
+	word-spacing:-1px;
+}
+.features .f-text img{
+	float:left;
+	margin:0 11px 0 0;
+}
+.features .f-text2{margin:0;}
+.features p {margin:0 0 10px 0;}
+.features .subhead {color:#333;}
+.social {
+	overflow:hidden;
+	border-bottom:1px solid #e0dfd5;
+	padding:42px 0 46px 0;
+	margin:0;
+	list-style:none;
+}
+.social li {
+	float:left;
+	margin:0 1px 0 43px;
+	background:url(../images/social.gif) no-repeat;
+	font-size:24px;
+	line-height:50px;
+	display:block;
+	font-weight:bold;
+}
+.social li:first-child {margin:0;}
+.social li.tw {
+	background-position:0 0;
+	padding:0 0 0 71px;
+	color:#1f7ec1;
+}
+.social li.rs {
+	background-position:-190px 0;
+	padding:0 0 0 56px;
+	color:#e49022;
+}
+.social li.em {
+	background-position:-346px 0;
+	padding:0 0 0 74px;
+	color:#689b5c;
+}
+.social li.sc {
+	background-position:-528px 0;
+	padding:0 0 0 77px;
+	color:#373737;
+}
+.social li.af {
+	background-position:-758px 0;
+	padding:0 0 0 77px;
+	color:#e7264a;
+}
+blockquote {
+	background:url(../images/comas-1.gif) no-repeat 0 7px;
+	overflow:hidden;
+	margin:42px 0 39px 0;
+	color:#383838;
+	letter-spacing:-2px;
+	font:56px/60px Georgia, "Times New Roman", Times, serif;
+}
+blockquote q {
+	background:url(../images/comas-2.gif) no-repeat right bottom;
+	padding:0 95px 15px 100px;
+	display:block;
+}
+blockquote cite {
+	float:right;
+	margin:0 109px 0 0;
+	padding:0 0 0 28px;
+	word-spacing:1px;
+	font:bold 24px/28px 'Helvetica', Arial, sans-serif;
+}
+.erlangjobs blockquote cite {
+	color:#c94c38;
+	background:url(../images/sep-1.gif) no-repeat left 15px;
+}
+.lispjobs blockquote cite {
+	color:#1f7ec1;
+	background:url(../images/sep-3.gif) no-repeat left center;
+}
+.schemejobs blockquote cite {
+	color:#ee9852;
+	background:url(../images/sep-4.gif) no-repeat left center;
+}
+.clojurejobs blockquote cite {
+	color:#50a326;
+	background:url(../images/sep-5.gif) no-repeat left center;
+}
+.post-job {
+	background:#eeeae3;
+	padding:22px 24px 20px 35px;
+	overflow:hidden;
+}
+.clojurejobs .post-job{background:#eeece1;}
+.post-job .text {
+	float:left;
+	color:#5d5d5d;
+	width:545px;
+	padding:18px 0 0 0;
+	font:24px/28px Georgia, "Times New Roman", Times, serif;
+}
+.post-job .text p {
+	margin:0;
+	letter-spacing:-1px;
+}
+.post-job .post-btn {float:right;}
+#footer {
+	width:960px;
+	margin:0 auto;
+	overflow:hidden;
+	text-align:center;
+	padding:46px 0 60px 0;
+	font:16px/20px Georgia, "Times New Roman", Times, serif;
+}
+#footer p {margin:0;}
+#footer .copyright {
+	padding:0 0 0 20px;
+	background:url(../images/sep-2.gif) no-repeat left center;
+}
+.banner .holder:after, #main:after, .features:after, .features .head:after {
+	clear:both;
+	display:block;
+	content:"";
+}
