@@ -1,7 +1,8 @@
 (defproject londonstartup "0.1.0-SNAPSHOT"
             :description "London Startup Directory"
-            :dependencies [[org.clojure/clojure "1.4.0"]
-                           [noir "1.3.0-beta3"]]
+            :dependencies [[org.clojure/clojure "1.5.0"]
+                           [noir "1.3.0-beta3"]
+                           [com.novemberain/monger "1.5.0"]]
             :license {:name "Simplified BSD License"
                       :url "http://en.wikipedia.org/wiki/BSD_licenses"}
             :main londonstartup.server
