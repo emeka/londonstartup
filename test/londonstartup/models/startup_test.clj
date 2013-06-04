@@ -37,6 +37,10 @@
   (deftest website->startup
     (is (= google (startup/website->startup "www.google.com"))))
 
+  (deftest website-free?
+    (is (startup/website-free? "www.doesnotexist.com"))
+    (is (not (startup/website-free? "www.google.com"))))
+
   (deftest startups
     (is (= (list google yahoo) (startup/startups))))
 
@@ -56,11 +60,4 @@
   (deftest remove-website!
     (startup/remove-website! "www.google.com")
     (is (= 1 (startup/total)))
-    (is (= nil (startup/id->startup google-id))))
-
-  ;(deftest valid?
-  ;  (with-noir
-  ;    (is (not (startup/valid? {})))
-  ;    (is (startup/valid? {:website "www.google.com" :name "Google Inc."}))))
-
-  )
+    (is (= nil (startup/id->startup google-id)))))
