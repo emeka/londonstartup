@@ -9,10 +9,17 @@
         hiccup.core
         hiccup.element
         hiccup.page
-        hiccup.form
-        )
+        hiccup.form)
   (import org.bson.types.ObjectId))
 
+;;Validation
+;(defn valid? [{:keys [website name]}]
+;  (validate/rule (validate/has-value? website)
+;    [:website "A startup must have a website"])
+;  (validate/rule (validate/has-value? name)
+;    [:name "A startup must have a name"])
+;  ;(not (validate/errors? :website :name)) ;;TODO: valid? should be at view level.
+;  )
 
 ;; Page Elements
 (defpartial error-text [errors]
@@ -23,8 +30,7 @@
   (text-field {:placeholder "Name"} :name name)
   (validate/on-error :website error-text)
   (text-field {:placeholder "Website"} :website website)
-  (hidden-field :_id _id)
-  )
+  (hidden-field :_id _id))
 
 (defpartial startup-form [action method url startup]
   (form-to [method url]
@@ -58,25 +64,21 @@
 
 ;; Routing
 (defpage startups "/startups" []
-  (startups-page (startup/startups)))
+  (startups-page (startup/value (startup/startups))))
 
 (defpage startup "/startup/:website" {:keys [website]}
-  (startup-page (startup/website->startup website)))
+  (startup-page (startup/value (startup/website->startup website))))
 
 (defpage startup-new [:post "/startups"] {:keys [website] :as new-startup}
-  (if (startup/add! new-startup)
+  (if (not (startup/has-error? (startup/add! new-startup)))
     (resp/redirect (url-for "/startup/:website" {:website website}))
-    (render startups)
-    ))
+    (render startups)))
 
 (defpage startup-update [:put "/startup/:_website"] {:keys [website _id] :as updated-startup}
-  ;;(str updated-startup website _id)
-  (if (startup/update! (dissoc (merge updated-startup {:_id (ObjectId. _id)}) :_method, :_website))
+  (if (not (startup/has-error? (startup/update! (dissoc (merge updated-startup {:_id (ObjectId. _id)}) :_method, :_website))))
     (resp/redirect (url-for "/startup/:website" {:website website}))
-    (render startup updated-startup)
-    )
-  )
+    (render startup updated-startup)))
 
 (defpage startup-remove [:delete "/startup/:website"] {:keys [website]}
-  (startup/remove-website! website)
+  (startup/value (startup/remove-website! website))
   (resp/redirect (url-for "/startups")))
