@@ -1,5 +1,6 @@
 (ns londonstartup.models.startup-test
   (:require [londonstartup.models.startup :as startup]
+            [londonstartup.models :as models]
             [monger.core :as mg]
             [monger.collection :as mc])
   (:use clojure.test)
@@ -18,7 +19,7 @@
     (is (= {:value nil :errors {:website ["Error1" "Error2"] :name ["Name Error"]}} result3))))
 
 (deftest result
-  (is (= {:value nil} (startup/result nil)) )
+  (is (= {:value nil} (startup/result nil)))
   (is (= {:value 3} (startup/result 3))))
 
 (deftest error
@@ -44,9 +45,9 @@
       yahoo {:_id yahoo-id :website "www.yahoo.com" :name "Yahoo! Inc."}
       github {:_id github-id :website "www.github.com" :name "Github"}]
 
-;; Fixtures
+  ;; Fixtures
   (defn init-db [f]
-    (mg/connect!)
+    (models/initialize)
     (mg/set-db! (mg/get-db "londonstartuptest"))
     (f))
 
@@ -59,10 +60,10 @@
   (use-fixtures :once init-db)
   (use-fixtures :each clean-db)
 
-;;Tests
+  ;;Tests
   (deftest valid?
-      (is (not (startup/has-error? (startup/valid? google))))
-      (is (startup/has-error? (startup/valid? {}))))
+    (is (not (startup/has-error? (startup/valid? google))))
+    (is (startup/has-error? (startup/valid? {}))))
 
   (deftest total
     (is (= 2 (startup/value (startup/total)))))
