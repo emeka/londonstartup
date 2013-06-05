@@ -1,5 +1,6 @@
 (ns londonstartup.models.startup-test
   (:require [londonstartup.models.startup :as startup]
+            [londonstartup.models :as models]
             [monger.core :as mg]
             [monger.collection :as mc])
   (:use clojure.test)
@@ -46,8 +47,7 @@
 
   ;; Fixtures
   (defn init-db [f]
-    (let [uri (get (System/getenv) "MONGOLAB_URI" "mongodb://127.0.0.1/londonstartup")]
-      (monger.core/connect-via-uri! uri))
+    (models/initialize)
     (mg/set-db! (mg/get-db "londonstartuptest"))
     (f))
 
