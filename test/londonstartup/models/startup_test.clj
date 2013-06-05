@@ -37,6 +37,7 @@
   (is (nil? (startup/value (startup/result nil))))
   (is (= 3 (startup/value (startup/result 3)))))
 
+
 ;; CRUD test
 (let [google-id (ObjectId.)
       yahoo-id (ObjectId.)
@@ -48,11 +49,11 @@
   ;; Fixtures
   (defn init-db [f]
     (models/initialize)
-    (mg/set-db! (mg/get-db "londonstartuptest"))
-    (f))
+    (binding [startup/collection "startupsTEST"]
+    (f)))
 
   (defn clean-db [f]
-    (mc/remove "startups")
+    (mc/remove startup/collection)
     (startup/add! google)
     (startup/add! yahoo)
     (f))

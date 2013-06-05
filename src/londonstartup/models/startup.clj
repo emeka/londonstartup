@@ -1,9 +1,12 @@
 (ns londonstartup.models.startup
   (:require [monger.core :as mg]
             [monger.collection :as mc]
-            [noir.validation :as validate])
+            [noir.validation :as validate]
+            [londonstartup.models :as models])
   (import org.bson.types.ObjectId))
 
+
+(def ^:dynamic collection "startups")
 
 ;; Result
 (defn add-error [result key msg]
@@ -44,48 +47,48 @@
       )))
 
 ;; CRUD
-(let [collection "startups"]
-  (defn total []
-    (result (mc/count collection)))
 
-  (defn id->startup [id]
-    (result (mc/find-one-as-map collection {:_id id})))
+(defn total []
+  (result (mc/count collection)))
 
-  (defn website->startup [website]
-    (result (mc/find-one-as-map collection {:website website})))
+(defn id->startup [id]
+  (result (mc/find-one-as-map collection {:_id id})))
 
-  (defn website-free? [website]
-    (result (= 0 (mc/count collection {:website website}))))
+(defn website->startup [website]
+  (result (mc/find-one-as-map collection {:website website})))
 
-  (defn startups []
-    (result (mc/find-maps collection)))
+(defn website-free? [website]
+  (result (= 0 (mc/count collection {:website website}))))
 
-  (defn add! [startup]
-    (let [validation-result (valid? startup)]
-      (if (not (has-error? validation-result))
-        (let [oid (if (has-id startup) (:_id startup) (ObjectId.))]
-          (if (nil? (value (id->startup oid)))
-            (if (value (website-free? (:website startup)))
-              (result (get (mc/insert-and-return collection (merge startup {:_id oid})) :_id ))
-              (error :website "Website already in use."))
-            (error :startup "Startup already exists")))
-        validation-result)))
+(defn startups []
+  (result (mc/find-maps collection)))
 
-  (defn update! [startup]
-    (let [validation-result (valid? startup)]
-      (if (not (has-error? validation-result))
-        (when-let [id (:_id startup)]
-          (when-let [old-startup (value (id->startup id))]
-            (if (or (= (:website startup) (:website old-startup)) (value (website-free? (:website startup))))
-              (do
-                (mc/update-by-id collection id startup)
-                (result id))
-              (error :website "Website already in use."))))
-        validation-result)))
+(defn add! [startup]
+  (let [validation-result (valid? startup)]
+    (if (not (has-error? validation-result))
+      (let [oid (if (has-id startup) (:_id startup) (ObjectId.))]
+        (if (nil? (value (id->startup oid)))
+          (if (value (website-free? (:website startup)))
+            (result (get (mc/insert-and-return collection (merge startup {:_id oid})) :_id ))
+            (error :website "Website already in use."))
+          (error :startup "Startup already exists")))
+      validation-result)))
+
+(defn update! [startup]
+  (let [validation-result (valid? startup)]
+    (if (not (has-error? validation-result))
+      (when-let [id (:_id startup)]
+        (when-let [old-startup (value (id->startup id))]
+          (if (or (= (:website startup) (:website old-startup)) (value (website-free? (:website startup))))
+            (do
+              (mc/update-by-id collection id startup)
+              (result id))
+            (error :website "Website already in use."))))
+      validation-result)))
 
 
-  (defn remove! [id]
-    (result (mc/remove-by-id collection id)))
+(defn remove! [id]
+  (result (mc/remove-by-id collection id)))
 
-  (defn remove-website! [website]
-    (result (mc/remove collection {:website website}))))
+(defn remove-website! [website]
+  (result (mc/remove collection {:website website})))
