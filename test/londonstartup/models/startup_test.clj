@@ -5,7 +5,6 @@
             [monger.collection :as mc]
             [londonstartup.common.result :as result])
   (:use clojure.test)
-  (:use noir.util.test)
   (import org.bson.types.ObjectId))
 
 
