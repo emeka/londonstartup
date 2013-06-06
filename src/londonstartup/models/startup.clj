@@ -60,6 +60,9 @@
 (defn website-free? [website]
   (result (= 0 (mc/count collection {:website website}))))
 
+(defn name-free? [name]
+  (result (= 0 (mc/count collection {:name name}))))
+
 (defn startups []
   (result (mc/find-maps collection)))
 
@@ -69,8 +72,10 @@
       (let [oid (if (has-id startup) (:_id startup) (ObjectId.))]
         (if (nil? (value (id->startup oid)))
           (if (value (website-free? (:website startup)))
-            (result (get (mc/insert-and-return collection (merge startup {:_id oid})) :_id ))
-            (error :website "Website already in use."))
+            (if (value (name-free? (:name startup)))
+              (result (get (mc/insert-and-return collection (merge startup {:_id oid})) :_id ))
+              (error :name "Company name already in use."))
+            (error :website "Website already in use"))
           (error :startup "Startup already exists")))
       validation-result)))
 
@@ -80,9 +85,11 @@
       (when-let [id (:_id startup)]
         (when-let [old-startup (value (id->startup id))]
           (if (or (= (:website startup) (:website old-startup)) (value (website-free? (:website startup))))
-            (do
-              (mc/update-by-id collection id startup)
-              (result id))
+            (if (or (= (:name startup) (:name old-startup)) (value (name-free? (:name startup))))
+              (do
+                (mc/update-by-id collection id startup)
+                (result id))
+              (error :name "Company name already in use."))
             (error :website "Website already in use."))))
       validation-result)))
 

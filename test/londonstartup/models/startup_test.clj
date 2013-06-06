@@ -50,7 +50,7 @@
   (defn init-db [f]
     (models/initialize)
     (binding [startup/collection "startupsTEST"]
-    (f)))
+      (f)))
 
   (defn clean-db [f]
     (mc/remove startup/collection)
@@ -79,16 +79,28 @@
     (is (startup/value (startup/website-free? "www.doesnotexist.com")))
     (is (not (startup/value (startup/website-free? "www.google.com")))))
 
+  (deftest name-free?
+    (is (startup/value (startup/name-free? "New Inc.")))
+    (is (not (startup/value (startup/name-free? "Google Inc.")))))
+
   (deftest startups
     (is (= (list google yahoo) (startup/value (startup/startups)))))
 
   (deftest add!
     (startup/add! github)
+    (is (= 3 (startup/value (startup/total))))
+    (is (startup/has-error? (startup/add! github)))
+    (is (= 3 (startup/value (startup/total))))
+    (is (startup/has-error? (startup/add! {:website "www.github.com" :name "Other"})))
+    (is (= 3 (startup/value (startup/total))))
+    (is (startup/has-error? (startup/add! {:website "www.other.com" :name "Github"})))
     (is (= 3 (startup/value (startup/total)))))
 
   (deftest update!
     (is (= google-id (startup/value (startup/update! (merge google {:website "www.new.com"})))))
-    ;(is (= "www.new.com" (:website (startup/value (startup/id->startup google-id))))))
+    (is (= "www.new.com" (:website (startup/value (startup/id->startup google-id)))))
+    (is (startup/has-error? (startup/update! (merge google {:website "www.yahoo.com"}))))
+    (is (startup/has-error? (startup/update! (merge google {:name "Yahoo! Inc."}))))
     )
 
   (deftest remove!
