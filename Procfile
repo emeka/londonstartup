@@ -1,1 +1,1 @@
-web: lein with-profile production trampoline run -m londonstartup.server
+web: lein with-profile production trampoline ring server-headless
