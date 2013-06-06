@@ -2,40 +2,40 @@
   (:require [londonstartup.models.startup :as startup]
             [londonstartup.models :as models]
             [monger.core :as mg]
-            [monger.collection :as mc])
+            [monger.collection :as mc]
+            [londonstartup.common.result :as result])
   (:use clojure.test)
-  (:use noir.util.test)
   (import org.bson.types.ObjectId))
 
 
 ;; Result test
 (deftest add-error
-  (let [init-result (startup/result nil)
-        result1 (startup/add-error init-result :website "Error1")
-        result2 (startup/add-error result1 :website "Error2")
-        result3 (startup/add-error result2 :name "Name Error")]
+  (let [init-result (result/result nil)
+        result1 (result/add-error init-result :website "Error1")
+        result2 (result/add-error result1 :website "Error2")
+        result3 (result/add-error result2 :name "Name Error")]
     (is (= {:value nil :errors {:website ["Error1"]}} result1))
     (is (= {:value nil :errors {:website ["Error1" "Error2"]}} result2))
     (is (= {:value nil :errors {:website ["Error1" "Error2"] :name ["Name Error"]}} result3))))
 
 (deftest result
-  (is (= {:value nil} (startup/result nil)))
-  (is (= {:value 3} (startup/result 3))))
+  (is (= {:value nil} (result/result nil)))
+  (is (= {:value 3} (result/result 3))))
 
 (deftest error
-  (is (= {:errors {:website ["Error"]}} (startup/error :website "Error"))))
+  (is (= {:errors {:website ["Error"]}} (result/error :website "Error"))))
 
 (deftest has-error?
-  (is (not (startup/has-error? (startup/result nil))))
-  (is (startup/has-error? (startup/add-error (startup/result nil) :website "Error"))))
+  (is (not (result/has-error? (result/result nil))))
+  (is (result/has-error? (result/add-error (result/result nil) :website "Error"))))
 
 (deftest errors
-  (is (nil? (startup/errors (startup/result nil))))
-  (is (= {:website ["Error"]} (startup/errors (startup/add-error (startup/result nil) :website "Error")))))
+  (is (nil? (result/errors (result/result nil))))
+  (is (= {:website ["Error"]} (result/errors (result/add-error (result/result nil) :website "Error")))))
 
 (deftest value
-  (is (nil? (startup/value (startup/result nil))))
-  (is (= 3 (startup/value (startup/result 3)))))
+  (is (nil? (result/value (result/result nil))))
+  (is (= 3 (result/value (result/result 3)))))
 
 
 ;; CRUD test
@@ -63,52 +63,52 @@
 
   ;;Tests
   (deftest valid?
-    (is (not (startup/has-error? (startup/valid? google))))
-    (is (startup/has-error? (startup/valid? {}))))
+    (is (not (result/has-error? (startup/valid? google))))
+    (is (result/has-error? (startup/valid? {}))))
 
   (deftest total
-    (is (= 2 (startup/value (startup/total)))))
+    (is (= 2 (result/value (startup/total)))))
 
   (deftest id->startup
-    (is (= google (startup/value (startup/id->startup google-id)))))
+    (is (= google (result/value (startup/id->startup google-id)))))
 
   (deftest website->startup
-    (is (= google (startup/value (startup/website->startup "www.google.com")))))
+    (is (= google (result/value (startup/website->startup "www.google.com")))))
 
   (deftest website-free?
-    (is (startup/value (startup/website-free? "www.doesnotexist.com")))
-    (is (not (startup/value (startup/website-free? "www.google.com")))))
+    (is (result/value (startup/website-free? "www.doesnotexist.com")))
+    (is (not (result/value (startup/website-free? "www.google.com")))))
 
   (deftest name-free?
-    (is (startup/value (startup/name-free? "New Inc.")))
-    (is (not (startup/value (startup/name-free? "Google Inc.")))))
+    (is (result/value (startup/name-free? "New Inc.")))
+    (is (not (result/value (startup/name-free? "Google Inc.")))))
 
   (deftest startups
-    (is (= (list google yahoo) (startup/value (startup/startups)))))
+    (is (= (list google yahoo) (result/value (startup/startups)))))
 
   (deftest add!
     (startup/add! github)
-    (is (= 3 (startup/value (startup/total))))
-    (is (startup/has-error? (startup/add! github)))
-    (is (= 3 (startup/value (startup/total))))
-    (is (startup/has-error? (startup/add! {:website "www.github.com" :name "Other"})))
-    (is (= 3 (startup/value (startup/total))))
-    (is (startup/has-error? (startup/add! {:website "www.other.com" :name "Github"})))
-    (is (= 3 (startup/value (startup/total)))))
+    (is (= 3 (result/value (startup/total))))
+    (is (result/has-error? (startup/add! github)))
+    (is (= 3 (result/value (startup/total))))
+    (is (result/has-error? (startup/add! {:website "www.github.com" :name "Other"})))
+    (is (= 3 (result/value (startup/total))))
+    (is (result/has-error? (startup/add! {:website "www.other.com" :name "Github"})))
+    (is (= 3 (result/value (startup/total)))))
 
   (deftest update!
-    (is (= google-id (startup/value (startup/update! (merge google {:website "www.new.com"})))))
-    (is (= "www.new.com" (:website (startup/value (startup/id->startup google-id)))))
-    (is (startup/has-error? (startup/update! (merge google {:website "www.yahoo.com"}))))
-    (is (startup/has-error? (startup/update! (merge google {:name "Yahoo! Inc."}))))
+    (is (= google-id (result/value (startup/update! (merge google {:website "www.new.com"})))))
+    (is (= "www.new.com" (:website (result/value (startup/id->startup google-id)))))
+    (is (result/has-error? (startup/update! (merge google {:website "www.yahoo.com"}))))
+    (is (result/has-error? (startup/update! (merge google {:name "Yahoo! Inc."}))))
     )
 
   (deftest remove!
     (startup/remove! google-id)
-    (is (= 1 (startup/value (startup/total))))
-    (is (= nil (startup/value (startup/id->startup google-id)))))
+    (is (= 1 (result/value (startup/total))))
+    (is (= nil (result/value (startup/id->startup google-id)))))
 
   (deftest remove-website!
     (startup/remove-website! "www.google.com")
-    (is (= 1 (startup/value (startup/total))))
-    (is (= nil (startup/value (startup/id->startup google-id))))))
+    (is (= 1 (result/value (startup/total))))
+    (is (= nil (result/value (startup/id->startup google-id))))))

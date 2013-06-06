@@ -1,12 +1,11 @@
 (ns londonstartup.views.common
-  (:use [noir.core :only [defpartial]]
-        [hiccup.page :only [include-css html5]]))
+  (:use [hiccup.page :only [include-css]]
+        [hiccup.def :only [defhtml]]))
 
-(defpartial layout [& content]
-            (html5
+(defhtml layout [& content]
               [:head
                [:title "londonstartup"]
                (include-css "/css/reset.css")]
               [:body
                [:div#wrapper
-                content]]))
+                content]])
