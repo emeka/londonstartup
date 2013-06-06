@@ -4,7 +4,8 @@
             [noir.content.getting-started]
             [noir.validation :as validate]
             [noir.response :as resp]
-            [clojure.string :as string])
+            [clojure.string :as string]
+            [londonstartup.common.result :as result])
   (:use noir.core
         hiccup.core
         hiccup.element
@@ -64,21 +65,21 @@
 
 ;; Routing
 (defpage startups "/startups" []
-  (startups-page (startup/value (startup/startups))))
+  (startups-page (result/value (startup/startups))))
 
 (defpage startup "/startup/:website" {:keys [website]}
-  (startup-page (startup/value (startup/website->startup website))))
+  (startup-page (result/value (startup/website->startup website))))
 
 (defpage startup-new [:post "/startups"] {:keys [website] :as new-startup}
-  (if (not (startup/has-error? (startup/add! new-startup)))
+  (if (not (result/has-error? (startup/add! new-startup)))
     (resp/redirect (url-for "/startup/:website" {:website website}))
     (render startups)))
 
 (defpage startup-update [:put "/startup/:_website"] {:keys [website _id] :as updated-startup}
-  (if (not (startup/has-error? (startup/update! (dissoc (merge updated-startup {:_id (ObjectId. _id)}) :_method, :_website))))
+  (if (not (result/has-error? (startup/update! (dissoc (merge updated-startup {:_id (ObjectId. _id)}) :_method, :_website))))
     (resp/redirect (url-for "/startup/:website" {:website website}))
     (render startup updated-startup)))
 
 (defpage startup-remove [:delete "/startup/:website"] {:keys [website]}
-  (startup/value (startup/remove-website! website))
+  (result/value (startup/remove-website! website))
   (resp/redirect (url-for "/startups")))
