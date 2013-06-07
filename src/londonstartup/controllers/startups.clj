@@ -5,22 +5,39 @@
             [londonstartup.common.result :as result])
   (import org.bson.types.ObjectId))
 
+(defn adapt-startup [startup]
+  (if-let [_id (:_id startup)]
+    (if (instance? ObjectId _id)
+      startup
+      (try
+        (assoc startup :_id (ObjectId. _id))
+        (catch Exception e (dissoc startup :_id))))
+    startup))
+
 ;; Routing
-(defn startups []
-  (views/startups-page (result/value (startup/startups))))
+(defn startups [& new-startup]
+  (views/startups-page (first new-startup) (result/value (startup/startups))))
 
 (defn startup [website]
-  (views/startup-page (result/value (startup/website->startup website))))
+  (let [lookup-result (startup/website->startup website)]
+    (if (not (result/has-error? lookup-result))
+      (views/startup-page (result/value lookup-result))
+      (resp/redirect "/startups")
+      )))
 
-(defn startup-new [website new-startup]
-  (if (not (result/has-error? (startup/add! new-startup)))
-    (resp/redirect (str "/startup/" website))
-    (startups)))
+(defn startup-new [startup]
+  (let [startup (adapt-startup startup)
+        add-result (startup/add! startup)]
+    (if (not (result/has-error? add-result))
+      (resp/redirect-after-post (str "/startup/" (:website startup)))
+      (startups startup))))
 
-(defn startup-update [website _id updated-startup]
-  (if (not (result/has-error? (startup/update! (dissoc (merge updated-startup {:_id (ObjectId. _id)}) :_method, :_website))))
-    (resp/redirect (str "/startup/" website))
-    (startup updated-startup)))
+(defn startup-update [startup]
+  (let [startup (adapt-startup startup)
+        update-result (startup/update! startup)]
+    (if (not (result/has-error? update-result))
+      (resp/redirect-after-post (str "/startup/" (:website startup)))
+      (startup startup))))
 
 (defn startup-delete [website]
   (startup/remove-website! website)

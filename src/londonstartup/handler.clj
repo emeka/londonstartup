@@ -3,16 +3,19 @@
             [compojure.route :as route]
             [londonstartup.models :as models]
             [londonstartup.controllers.startups :as controllers]
+            [ring.util.response :as resp]
             [noir.util.middleware :as nm]
             )
-  (:use compojure.core))
+  (:use compojure.core)
+  (import org.bson.types.ObjectId))
 
 ;;; Routing
 (defroutes app-routes
+  (GET "/" [] (resp/redirect "/startups"))
   (GET "/startups" [] (controllers/startups))
   (GET "/startup/:website" [website] (controllers/startup website))
-  (POST "/startups" [website :as {new-startup :params}] (controllers/startup-new website new-startup))
-  (PUT "/startup/:_website" [website _id :as {updated-startup :params}] (controllers/startup-update website _id updated-startup))
+  (POST "/startups" [:as {startup :params}] (controllers/startup-new startup))
+  (PUT "/startup/:_website" [:as {startup :params}] (controllers/startup-update startup))
   (DELETE "/startup/:website" [website] (controllers/startup-delete website)))
 
 (def app

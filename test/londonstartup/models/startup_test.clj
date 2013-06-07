@@ -70,10 +70,12 @@
     (is (= 2 (result/value (startup/total)))))
 
   (deftest id->startup
-    (is (= google (result/value (startup/id->startup google-id)))))
+    (is (= google (result/value (startup/id->startup google-id))))
+    (is (result/has-error? (startup/id->startup "1234"))))
 
   (deftest website->startup
-    (is (= google (result/value (startup/website->startup "www.google.com")))))
+    (is (= google (result/value (startup/website->startup "www.google.com"))))
+    (is (result/has-error? (startup/website->startup "www.doesnotexist.com"))))
 
   (deftest website-free?
     (is (result/value (startup/website-free? "www.doesnotexist.com")))
@@ -97,7 +99,7 @@
     (is (= 3 (result/value (startup/total)))))
 
   (deftest update!
-    (is (= google-id (result/value (startup/update! (merge google {:website "www.new.com"})))))
+    (is (= google-id (:_id (result/value (startup/update! (merge google {:website "www.new.com"}))))))
     (is (= "www.new.com" (:website (result/value (startup/id->startup google-id)))))
     (is (result/has-error? (startup/update! (merge google {:website "www.yahoo.com"}))))
     (is (result/has-error? (startup/update! (merge google {:name "Yahoo! Inc."}))))

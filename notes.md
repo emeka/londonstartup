@@ -7,3 +7,8 @@ http://www.bypeople.com/web-design-trends-2013/
 
 
 http://cageapp.com/
+
+http://johnpolacek.github.io/scrolldeck.js/decks/parallax/
+
+
+https://github.com/ohpauleez/shoreleave

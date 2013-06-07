@@ -33,10 +33,16 @@
   (result/result (mc/count collection)))
 
 (defn id->startup [id]
-  (result/result (mc/find-one-as-map collection {:_id id})))
+  (let [lookup (mc/find-one-as-map collection {:_id id})]
+    (if lookup
+      (result/result lookup)
+      (result/error :website "Unknown startup ID"))))
 
 (defn website->startup [website]
-  (result/result (mc/find-one-as-map collection {:website website})))
+  (let [lookup (mc/find-one-as-map collection {:website website})]
+    (if lookup
+      (result/result lookup)
+      (result/error :website "Unknown website"))))
 
 (defn website-free? [website]
   (result/result (= 0 (mc/count collection {:website website}))))
@@ -54,7 +60,7 @@
         (if (nil? (result/value (id->startup oid)))
           (if (result/value (website-free? (:website startup)))
             (if (result/value (name-free? (:name startup)))
-              (result/result (get (mc/insert-and-return collection (merge startup {:_id oid})) :_id ))
+              (result/result (mc/insert-and-return collection (merge startup {:_id oid})))
               (result/error :name "Company name already in use."))
             (result/error :website "Website already in use"))
           (result/error :startup "Startup already exists")))
@@ -67,9 +73,12 @@
         (when-let [old-startup (result/value (id->startup id))]
           (if (or (= (:website startup) (:website old-startup)) (result/value (website-free? (:website startup))))
             (if (or (= (:name startup) (:name old-startup)) (result/value (name-free? (:name startup))))
-              (do
-                (mc/update-by-id collection id startup)
-                (result/result id))
+              (try (do
+                     (let [update-result (mc/update-by-id collection id startup)]
+                       (if (.getField update-result "updatedExisting")
+                         (result/result startup)
+                         (result/error :startup "Could not update"))))
+                (catch Exception e (result/error :startup "Could not update")))
               (result/error :name "Company name already in use."))
             (result/error :website "Website already in use."))))
       validation-result)))
