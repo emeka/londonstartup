@@ -58,9 +58,9 @@
       [:div (startup-item startup)]
       [:div (startup-form "Update" :put (str "/startup/" website) startup)]))) ;The url should be calculated from the route
 
-(defn startups-page [startups]
+(defn startups-page [new-startup startups]
   (html
     (common/layout
       [:h1 "London Startup Directory"]
-      (startup-form "Add" :post "/startups" {})
+      (startup-form "Add" :post "/startups" new-startup)
       [:ul.startups (map #(conj [:li ] (startup-item %)) startups)]))) ;The url should be calculated from the route
