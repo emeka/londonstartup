@@ -24,17 +24,19 @@
 (defn startup-form-field [{:keys [website name _id]}]
   (html
     (validate/on-error :name error-text)
+    (label :name-label "Name: ")
     (text-field {:placeholder "Name"} :name name)
     (validate/on-error :website error-text)
+    (label :website-label "Website:")
     (text-field {:placeholder "Website"} :website website)
     (hidden-field :_id _id)))
 
 (defn startup-form [action method url startup]
   (html
     (form-to [method url]
-      [:ul.actions [:li (link-to {:class "submit"} "/" action)]]
       (startup-form-field startup)
-      (submit-button {:class "submit"} action))))
+      (submit-button {:class "submit"} action))
+    (startup-remove-form startup)))
 
 (defn startup-remove-form [{:keys [website]}]
   (html
@@ -47,7 +49,6 @@
     (when startup
       [:dl.startup [:dt "Company Name:"]
        [:dd (link-to (str "/startup/" website) name)] ;The url should be calculated from the route
-       (startup-remove-form startup)
        [:dt "Website:"]
        [:dd website]])))
 
