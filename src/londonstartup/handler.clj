@@ -16,7 +16,8 @@
   (GET "/startup/:website" [website] (controllers/startup website))
   (POST "/startups" [:as {startup :params}] (controllers/startup-new startup))
   (PUT "/startup/:_website" [:as {startup :params}] (controllers/startup-update startup))
-  (DELETE "/startup/:website" [website] (controllers/startup-delete website)))
+  (DELETE "/startup/:website" [website] (controllers/startup-delete website))
+  (route/resources "/"))
 
 (def app
   (nm/app-handler [app-routes])) ;; the app-handler breaks the API as it require a vector of routes.

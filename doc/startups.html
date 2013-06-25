@@ -11,8 +11,6 @@
     <link href="http://twitter.github.io/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
     <link href="http://twitter.github.io/bootstrap/assets/css/bootstrap-responsive.css" rel="stylesheet">
     <link href="http://twitter.github.io/bootstrap/assets/css/docs.css" rel="stylesheet">
-    <link href="http://twitter.github.io/bootstrap/assets/js/google-code-prettify/prettify.css" rel="stylesheet">
-
 
     <!-- Le fav and touch icons -->
     <link rel="apple-touch-icon-precomposed" sizes="144x144"
@@ -39,15 +37,14 @@
 
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
-
-
         <div class="container-fluid">
             <a class="brand pull-left" href="#">SD/London</a>
+
             <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
             <a class="btn btn-navbar collapsed" data-toggle="collapse" data-target="#nav-collapse">
-                <span class="icon-bar">a</span>
-                <span class="icon-bar">b</span>
-                <span class="icon-bar">c</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
             </a>
 
             <div class="nav-collapse collapse" id="nav-collapse">
@@ -56,7 +53,8 @@
                     <li><a href="#fakelink">News</a></li>
                     <li><a href="#fakelink">Jobs</a></li>
                     <li><a href="#fakelink">About</a></li>
-                    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">More<b class="caret"></b></a>
+                    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">More<b
+                            class="caret"></b></a>
                         <ul class="dropdown-menu">
                             <li><a href="#fakelink">Add New Startup</a></li>
                             <li><a href="#fakelink">My Settings</a></li>
@@ -80,90 +78,91 @@
     <div class="container">
         <h1>London Startup Directory</h1>
 
-        <p class="lead">Bring Bootstrap's components to life—now with 13 custom jQuery plugins.</p>
+        <p class="lead">The open startup reference in London.</p>
     </div>
 </header>
 
 
-<div id="startup-1" class="startup container-fluid">
+<section id="startup-1" class="startup container-fluid">
     <div class="row">
-        <div class="startup-identification span6">
+        <div class="startup-header span6">
             <h2><a href="#startup-1-details" data-toggle="collapse">Google Inc.</a>
                 <small>A leading search engine.</small>
             </h2>
         </div>
         <div class="startup-badges span4 offset2">
             <h2>
-                <small><i class="fui-user"></i> 13 <i class="fui-chat"></i> 25500 <i class="fui-heart"></i> 2045</small>
+                <small><i class="icon-user"></i> 13 <i class="icon-bullhorn"></i> 25500 <i class="icon-heart"></i> 2045
+                </small>
             </h2>
         </div>
     </div>
-    <div id="startup-1-details" class="collapse">
-        <div class="row">
-            <div class="startup-badges  btn-group span12">
-                <a class="btn btn-primary" href="#startup-1-location" data-toggle="collapse"
-                   data-parent="#startup-1-details"><i class="fui-location"></i></a>
-                <a class="btn btn-primary" href="#fakelink"><i class="fui-photo"></i></a>
-                <a class="btn btn-primary" href="#fakelink"><i class="fui-video"></i></a>
-                <a class="btn btn-primary" href="#fakelink"><i class="fui-user"></i></a>
-                <a class="btn btn-primary" href="#fakelink"><i class="fui-mail"></i></a>
-                <a class="btn btn-primary" href="#startup-1-edit" data-toggle="collapse"
-                   data-parent="#startup-1-details"><i class="fui-new"></i></a>
+    <div id="startup-1-details" class="tabbable collapse">
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#startup-1-location" data-toggle="tab"><i class="icon-map-marker"></i></a></li>
+            <li><a href="#fakelink" data-toggle="tab"><i class="icon-bullhorn"></i></a></li>
+            <li><a href="#fakelink" data-toggle="tab"><i class="icon-camera"></i></a></li>
+            <li><a href="#fakelink" data-toggle="tab"><i class="icon-film"></i></a></li>
+            <li><a href="#fakelink" data-toggle="tab"><i class="icon-user"></i></a></li>
+            <li><a href="#fakelink" data-toggle="tab"><i class="icon-envelope"></i></a></li>
+            <li><a href="#startup-1-edit" data-toggle="tab"><i class="icon-edit"></i></a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="startup-1-location" class="tab-pane active">
+                <address class="span6">
+                    <strong>Google London</strong><br>
+                    Belgrave House<br>
+                    76 Buckingham Palace Rd<br>
+                    London<br>
+                    Greater London<br>
+                    SW1W 9TQ<br><br>
+
+                    <strong>Phone</strong><br>‎
+                    020 7031 3000<br><br>
+
+                    <strong>Website</strong><br>
+                    <a href="http://google.co.uk">google.co.uk</a>
+                </address>
+                <div class="span6">
+                    <iframe width="300" height="300" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"
+                            src="https://maps.google.co.uk/maps?f=q&amp;source=s_q&amp;hl=en&amp;geocode=&amp;q=Google+London,+Buckingham+Palace+Road,+London&amp;aq=0&amp;oq=google+lon&amp;sll=51.48931,-0.08819&amp;sspn=1.061176,1.253815&amp;ie=UTF8&amp;hq=Google+London,+Buckingham+Palace+Road,+London&amp;t=m&amp;ll=51.494904,-0.146427&amp;spn=0.008016,0.012875&amp;z=15&amp;iwloc=near&amp;output=embed"></iframe>
+                    <br/>
+                    <small><a
+                            href="https://maps.google.co.uk/maps?f=q&amp;source=embed&amp;hl=en&amp;geocode=&amp;q=Google+London,+Buckingham+Palace+Road,+London&amp;aq=0&amp;oq=google+lon&amp;sll=51.48931,-0.08819&amp;sspn=1.061176,1.253815&amp;ie=UTF8&amp;hq=Google+London,+Buckingham+Palace+Road,+London&amp;t=m&amp;ll=51.494904,-0.146427&amp;spn=0.008016,0.012875&amp;z=15&amp;iwloc=A"
+                            >View Larger Map</a></small>
+                </div>
             </div>
-        </div>
+            <div id="startup-1-edit" class="tab-pane">
+                <div class="span12">
+                    <h2>Update</h2>
 
-        <div id="startup-1-location" class="collapse row in">
-            <address class="span6">
-                <strong>Google London</strong><br>
-                Belgrave House<br>
-                76 Buckingham Palace Rd<br>
-                London<br>
-                Greater London<br>
-                SW1W 9TQ<br><br>
+                    <form>
+                        <div class="control-group">
+                            <label class="control-label" for="startupName">Name</label>
 
-                <strong>Phone</strong><br>‎
-                020 7031 3000<br><br>
-
-                <strong>Website</strong><br>
-                <a href="http://google.co.uk">google.co.uk</a>
-            </address>
-            <div class="span6">
-                <iframe width="300" height="300" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"
-                        src="https://maps.google.co.uk/maps?f=q&amp;source=s_q&amp;hl=en&amp;geocode=&amp;q=Google+London,+Buckingham+Palace+Road,+London&amp;aq=0&amp;oq=google+lon&amp;sll=51.48931,-0.08819&amp;sspn=1.061176,1.253815&amp;ie=UTF8&amp;hq=Google+London,+Buckingham+Palace+Road,+London&amp;t=m&amp;ll=51.494904,-0.146427&amp;spn=0.008016,0.012875&amp;z=15&amp;iwloc=A&amp;output=embed"></iframe>
-                <br/>
-                <small><a
-                        href="https://maps.google.co.uk/maps?f=q&amp;source=embed&amp;hl=en&amp;geocode=&amp;q=Google+London,+Buckingham+Palace+Road,+London&amp;aq=0&amp;oq=google+lon&amp;sll=51.48931,-0.08819&amp;sspn=1.061176,1.253815&amp;ie=UTF8&amp;hq=Google+London,+Buckingham+Palace+Road,+London&amp;t=m&amp;ll=51.494904,-0.146427&amp;spn=0.008016,0.012875&amp;z=15&amp;iwloc=A"
-                        style="color:#0000FF;text-align:left">View Larger Map</a></small>
-            </div>
-        </div>
-        <div id="startup-1-edit" class="collapse row">
-            <div class="span12">
-                <h2>Update</h2>
-
-                <form>
-                    <div class="control-group">
-                        <label class="control-label" for="startupName">Name</label>
-
-                        <div class="controls">
-                            <input type="text" id="startupName" placeholder="Startup Name" value="Google London">
+                            <div class="controls">
+                                <input type="text" id="startupName" placeholder="Startup Name"
+                                       value="Google London">
+                            </div>
                         </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="startupWebsite">Website</label>
+                        <div class="control-group">
+                            <label class="control-label" for="startupWebsite">Website</label>
 
-                        <div class="controls">
-                            <input type="text" id="startupWebsite" placeholder="Startup Website"
-                                   value="www.google.co.uk">
+                            <div class="controls">
+                                <input type="text" id="startupWebsite" placeholder="Startup Website"
+                                       value="www.google.co.uk">
+                            </div>
                         </div>
-                    </div>
-                    <button type="submit" class="btn" data-toggle="collapse" data-target="#startup-1-edit">Cancel
-                    </button>
-                    <button type="submit" class="btn btn-danger">Submit</button>
-                </form>
+                        <button type="submit" class="btn" data-toggle="collapse" data-target="#startup-1-edit">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-danger">Submit</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 
 <div class="footer container-fluid">
 
@@ -171,18 +170,8 @@
 </div>
 
 <!-- Load JS here for greater good =============================-->
-<script src="../resources/public/ui/js/jquery-1.8.3.min.js"></script>
-<script src="../resources/public/ui/js/jquery-ui-1.10.3.custom.min.js"></script>
-<script src="../resources/public/ui/js/jquery.ui.touch-punch.min.js"></script>
-<script src="../resources/public/ui/js/bootstrap.min.js"></script>
-<script src="../resources/public/ui/js/bootstrap-select.js"></script>
-<script src="../resources/public/ui/js/bootstrap-switch.js"></script>
-<script src="../resources/public/ui/js/flatui-checkbox.js"></script>
-<script src="../resources/public/ui/js/flatui-radio.js"></script>
-<script src="../resources/public/ui/js/jquery.tagsinput.js"></script>
-<script src="../resources/public/ui/js/jquery.placeholder.js"></script>
-<script src="../resources/public/ui/js/jquery.stacktable.js"></script>
-<script src="http://vjs.zencdn.net/c/video.js"></script>
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script src="../resources/public/bootstrap/js/bootstrap.min.js"></script>
 <script src="../resources/public/js/application.js"></script>
 </body>
 </html>
