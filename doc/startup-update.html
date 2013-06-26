@@ -74,16 +74,7 @@
     </div>
 </div>
 
-<header class="jumbotron subhead">
-    <div class="container">
-        <h1>London Startup Directory</h1>
-
-        <p class="lead">The open startup reference in London.</p>
-    </div>
-</header>
-
-
-<section id="startup-1" class="startup container-fluid">
+<header id="startup-1" class="startup container-fluid">
     <div class="row">
         <div class="startup-header span6">
             <h2><a href="startup.html">Google Inc.</a>
@@ -97,16 +88,47 @@
             </h2>
         </div>
     </div>
-</section>
+</header>
 
-<div class="footer container-fluid">
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div id="startup-1-edit" class="tab-pane">
+            <div class="span12">
+                <h2>Update</h2>
+                <form>
+                    <div class="control-group">
+                        <label class="control-label" for="startupName">Name</label>
+
+                        <div class="controls">
+                            <input type="text" id="startupName" placeholder="Startup Name"
+                                   value="Google London">
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="startupWebsite">Website</label>
+
+                        <div class="controls">
+                            <input type="text" id="startupWebsite" placeholder="Startup Website"
+                                   value="www.google.co.uk">
+                        </div>
+                    </div>
+                    <a class="btn" href="startup.html">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-danger">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="container-fluid">
 
 
-</div>
+    </footer>
 
-<!-- Load JS here for greater good =============================-->
-<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-<script src="../resources/public/bootstrap/js/bootstrap.min.js"></script>
-<script src="../resources/public/js/application.js"></script>
+    <!-- Load JS here for greater good =============================-->
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="../resources/public/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../resources/public/js/application.js"></script>
 </body>
 </html>

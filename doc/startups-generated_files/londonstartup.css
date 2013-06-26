@@ -9,10 +9,6 @@
   }
 }
 
-body {
-    padding-top: 45px;
-}
-
 body > .navbar .brand {
     float: left;
 }

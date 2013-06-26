@@ -76,37 +76,46 @@
 
 <header class="jumbotron subhead">
     <div class="container">
-        <h1>London Startup Directory</h1>
-
-        <p class="lead">The open startup reference in London.</p>
+        <h1>Add a new startup</h1>
     </div>
 </header>
 
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span12">
+            <form>
+                <div class="control-group">
+                    <label class="control-label" for="startupName">Name</label>
 
-<section id="startup-1" class="startup container-fluid">
-    <div class="row">
-        <div class="startup-header span6">
-            <h2><a href="startup.html">Google Inc.</a>
-                <small>A leading search engine.</small>
-            </h2>
-        </div>
-        <div class="startup-badges span4 offset2">
-            <h2>
-                <small><i class="icon-user"></i> 13 <i class="icon-bullhorn"></i> 25500 <i class="icon-heart"></i> 2045
-                </small>
-            </h2>
+                    <div class="controls">
+                        <input type="text" id="startupName" placeholder="Startup Name"
+                               value="Google London">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="startupWebsite">Website</label>
+
+                    <div class="controls">
+                        <input type="text" id="startupWebsite" placeholder="Startup Website"
+                               value="www.google.co.uk">
+                    </div>
+                </div>
+                <a class="btn" href="startups.html">
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-danger">Submit</button>
+            </form>
         </div>
     </div>
-</section>
 
-<div class="footer container-fluid">
+    <footer class="container-fluid">
 
 
-</div>
+    </footer>
 
-<!-- Load JS here for greater good =============================-->
-<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-<script src="../resources/public/bootstrap/js/bootstrap.min.js"></script>
-<script src="../resources/public/js/application.js"></script>
+    <!-- Load JS here for greater good =============================-->
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="../resources/public/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../resources/public/js/application.js"></script>
 </body>
 </html>
