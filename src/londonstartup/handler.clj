@@ -13,13 +13,13 @@
 (defroutes app-routes
   (GET "/" [] (resp/redirect "/startups"))
   (GET "/startups" [] (controllers/startups))
-  (GET "/startup/:website" [website] (controllers/startup website))
+  (GET "/startups/:website" [website] (controllers/startup website))
   (POST "/startups" [:as {startup :params}] (controllers/startup-new startup))
-  (PUT "/startup/:_website" [:as {startup :params}] (controllers/startup-update startup))
-  (DELETE "/startup/:website" [website] (controllers/startup-delete website))
+  (PUT "/startups/:_website" [:as {startup :params}] (controllers/startup-update startup))
+  (DELETE "/startups/:website" [website] (controllers/startup-delete website))
 ;;Forms
-  (GET "/add/startup" [] (controllers/add-startup-form))
-  (GET "/update/startup/:website" [website] (controllers/update-startup-form website))
+  (GET "/add/startups" [] (controllers/add-startup-form))
+  (GET "/update/startups/:website" [website] (controllers/update-startup-form website))
 ;;Static Resources
   (route/resources "/"))
 

@@ -30,6 +30,12 @@
 (defn idref [startup & suffix]
   (str "#" (id startup (first suffix))))
 
+(defn get-link [{:keys [website]} & content]
+  (link-to (str "/startups/" website) content))
+
+(defn update-link [{:keys [website]} & content]
+  (link-to (str "/update/startups/" website) content))
+
 ;;Forms
 (defn error-text [errors]
   [:span (string/join "" errors)])
@@ -47,30 +53,38 @@
 
 (defn startup-remove-form [{:keys [website]}]
   (when website
-    (form-to [:delete (str "/startup/" website)] ;The url should be calculated from the route
+    (form-to [:delete (str "/startups/" website)] ;The url should be calculated from the route
       (submit-button {:class "btn btn-danger"} "Delete"))))
 
 (defn startup-form [action method url startup]
   (form-to [method url]
     (startup-fields startup)
-    (submit-button {:class "btn"} action)))
+    [:a.btn {:href url} "Cancel"]
+    (submit-button {:class "btn btn-primary"} action)
+    ))
 
 ;;Header
 (defn badge [icon value]
   [:small (bs/icon icon) " " value " "])
 
+(defn startup-edit-button [startup]
+  [:small (update-link startup [:i.icon-edit ])])
+
 (defn startup-name [{:keys [name] :as startup}]
-  [:div.startup-header.span6 [:h2 [:a {:href (idref startup "details") :data-toggle "collapse"} name]]])
+  [:div.startup-header.span6 [:h2 (get-link startup name)]])
+
+
 
 (defn startup-badges [startup]
-  [:div.startup-badges.span4.offset2 [:h2 (badge "icon-user" 13) (badge "icon-bullhorn" 2450) (badge "icon-heart" 200)]])
+  [:div.startup-badges.span4.offset2 [:h2 (badge "icon-user" 13) (badge "icon-bullhorn" 2450) (badge "icon-heart" 200) [:small (update-link startup [:i.icon-edit])]]])
 
 (defn startup-header [startup]
   [:div.row (startup-name startup) (startup-badges startup)])
 
+
+;;Details
 (defn address [{:keys [name website] :as startup}]
-  [:address.span6
-   [:strong name] [:br ]
+  [:address.span3 [:strong name] [:br ]
    [:span "Belgrave House"] [:br ]
    [:span "76 Buckingham Palace Rd"] [:br ]
    [:span "London"] [:br ]
@@ -87,56 +101,57 @@
 
 ;;Details
 (defn location [{:keys [name website] :as startup}]
-  (list
-    (address startup)
-    (str "<div class=\"span6\">
+  (str "<div class=\"span3\">
                       <iframe width=\"300\" height=\"300\" frameborder=\"0\" scrolling=\"no\" marginheight=\"0\" marginwidth=\"0\"
                               src=\"https://maps.google.co.uk/maps?f=q&amp;source=s_q&amp;hl=en&amp;geocode=&amp;q=Google+London,+Buckingham+Palace+Road,+London&amp;aq=0&amp;oq=google+lon&amp;sll=51.48931,-0.08819&amp;sspn=1.061176,1.253815&amp;ie=UTF8&amp;hq=Google+London,+Buckingham+Palace+Road,+London&amp;t=m&amp;ll=51.494904,-0.146427&amp;spn=0.008016,0.012875&amp;z=15&amp;iwloc=near&amp;output=embed\"></iframe>
                       <br/>
                       <small><a
                               href=\"https://maps.google.co.uk/maps?f=q&amp;source=embed&amp;hl=en&amp;geocode=&amp;q=Google+London,+Buckingham+Palace+Road,+London&amp;aq=0&amp;oq=google+lon&amp;sll=51.48931,-0.08819&amp;sspn=1.061176,1.253815&amp;ie=UTF8&amp;hq=Google+London,+Buckingham+Palace+Road,+London&amp;t=m&amp;ll=51.494904,-0.146427&amp;spn=0.008016,0.012875&amp;z=15&amp;iwloc=A\"
                               >View Larger Map</a></small>
-                  </div>"))
+                  </div>")
   )
 
-(defn update [{:keys [name website] :as startup}]
-  (list
-    [:h2 "Update"]
-    (startup-form "Update" :put (str "/startup/" website) startup)))
-
-(defn startup-details [{:keys [_id] :as startup}]
-  (bs/tabs (id startup "details")
-    {:id (id startup "location") :tab (bs/icon "icon-map-marker") :content (location startup)}
-    {:id (id startup "edit") :tab (bs/icon "icon-edit") :content (update startup)}
-    ))
-
 ;;One startup
-(defn startup-item [{:keys [_id website name] :as startup}]
+(defn startup-summary [{:keys [_id website name] :as startup}]
   (when startup
     [:section.startup.container-fluid {:id (id startup)}
-     (startup-header startup) (startup-details startup)]))
+     (startup-header startup)]))
+
+(defn startup-dashboard [startup]
+  (when startup
+    [:section.startup.container-fluid {:id (id startup)}
+     (startup-header startup)
+     [:div.row (address startup)
+      (location startup)
+      ]]
+    ))
 
 ;;Several startups
 (defn startup-list [startups]
-  (map #(startup-item %) startups))
+  (map #(startup-summary %) startups))
 
 ;; Pages
 (defn startup-page [{:keys [website] :as startup}]
   (common/layout
-    [:div (startup-item startup)]
-    [:div (startup-form "Update" :put (str "/startup/" website) startup)])) ;The url should be calculated from the route
+    (startup-dashboard startup))) ;The url should be calculated from the route
 
 (defn startups-page [new-startup startups]
   (common/layout
     [:header.jumbotron.subhead [:div.container [:h1 "London Startup Directory"]
-                                [:p.lead "The open startup reference in London."]]]
+                                [:p.lead "The open startup reference in London."]
+                                [:a.btn.btn-large.btn-danger {:href "/add/startups"} "Add Your Startup Now!"]]]
     (startup-list startups)))
+
+;;Form Pages
 
 (defn add-startup-page []
   (common/layout
-    (startup-form "Add" :post "/startups" {}))) ;The url should be calculated from the route
+    [:header.jumbotron.subhead [:div.container [:h1 "Add New Startup"]]]
+    [:div.container-fluid [:div.row-fluid [:div.span12 (startup-form "Add" :post "/startups" {})]]])) ;The url should be calculated from the route
 
 (defn update-startup-page [{:keys [website] :as startup}]
   (common/layout
-    (startup-form "Update" :put (str "/startup/" website) startup) ;The url should be calculated from the route
-    (startup-remove-form startup)))
+    [:header.container-fluid (startup-header startup)]
+    [:div.container-fluid [:div.row-fluid [:div.span12
+    (startup-form "Update" :put (str "/startups/" website) startup) ;The url should be calculated from the route
+    (startup-remove-form startup)]]]))

@@ -3,12 +3,12 @@
         [hiccup.def :only [defhtml]]
         [hiccup.element :only [link-to]]))
 
-(def menu-definition {"Home" "/" "Jobs" "#fakelink" "About" "#fakelink" "More" {"Add New Startup" "/add/startup" "My Settings" "#fakelink"}})
+(def menu-definition {"Home" "/" "Jobs" "#fakelink" "About" "#fakelink" "More" {"Add New Startup" "/add/startups" "My Settings" "#fakelink"}})
 
 (declare menu)
 
 (defn dropdown-menu [label menu]
-  [:li.dropdown [:a.dropdown-toggle {:href "#" :data-toggle "dropdown"} label]
+  [:li.dropdown [:a.dropdown-toggle {:href "#" :data-toggle "dropdown"} label [:b.caret]]
    menu])
 
 (defn menu [definition class]
