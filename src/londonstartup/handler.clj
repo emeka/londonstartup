@@ -17,6 +17,10 @@
   (POST "/startups" [:as {startup :params}] (controllers/startup-new startup))
   (PUT "/startup/:_website" [:as {startup :params}] (controllers/startup-update startup))
   (DELETE "/startup/:website" [website] (controllers/startup-delete website))
+;;Forms
+  (GET "/add/startup" [] (controllers/add-startup-form))
+  (GET "/update/startup/:website" [website] (controllers/update-startup-form website))
+;;Static Resources
   (route/resources "/"))
 
 (def app

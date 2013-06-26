@@ -3,7 +3,7 @@
         [hiccup.def :only [defhtml]]
         [hiccup.element :only [link-to]]))
 
-(def menu-definition {"Home" "/" "Jobs" "#fakelink" "About" "#fakelink" "More" {"Add New Startup" "#fakelink" "My Settings" "#fakelink"}})
+(def menu-definition {"Home" "/" "Jobs" "#fakelink" "About" "#fakelink" "More" {"Add New Startup" "/add/startup" "My Settings" "#fakelink"}})
 
 (declare menu)
 

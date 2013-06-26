@@ -42,9 +42,9 @@
 (let [google-id (ObjectId.)
       yahoo-id (ObjectId.)
       github-id (ObjectId.)
-      google {:_id google-id :website "www.google.com" :name "Google Inc."}
-      yahoo {:_id yahoo-id :website "www.yahoo.com" :name "Yahoo! Inc."}
-      github {:_id github-id :website "www.github.com" :name "Github"}]
+      google {:_id google-id :website "www.google.com" :name "Google Inc." :lead "A leading search engine."}
+      yahoo {:_id yahoo-id :website "www.yahoo.com" :name "Yahoo! Inc." :lead "A leading directory."}
+      github {:_id github-id :website "www.github.com" :name "Github" :lead "The open source repository."}]
 
   ;; Fixtures
   (defn init-db [f]
