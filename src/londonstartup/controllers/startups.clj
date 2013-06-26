@@ -14,7 +14,6 @@
         (catch Exception e (dissoc startup :_id))))
     startup))
 
-;; Routing
 (defn startups [& new-startup]
   (views/startups-page (first new-startup) (result/value (startup/startups))))
 
@@ -42,3 +41,15 @@
 (defn startup-delete [website]
   (startup/remove-website! website)
   (resp/redirect "/startups"))
+
+;;Forms
+
+(defn add-startup-form []
+  (views/add-startup-page))
+
+(defn update-startup-form [website]
+  (let [lookup-result (startup/website->startup website)]
+    (if (not (result/has-error? lookup-result))
+      (views/update-startup-page (result/value lookup-result))
+      (resp/redirect "/startups")
+      )))
