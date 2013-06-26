@@ -28,14 +28,14 @@
   (let [startup (adapt-startup startup)
         add-result (startup/add! startup)]
     (if (not (result/has-error? add-result))
-      (resp/redirect-after-post (str "/startup/" (:website startup)))
+      (resp/redirect-after-post (str "/startups/" (:website startup)))
       (startups startup))))
 
 (defn startup-update [startup]
   (let [startup (adapt-startup startup)
         update-result (startup/update! startup)]
     (if (not (result/has-error? update-result))
-      (resp/redirect-after-post (str "/startup/" (:website startup)))
+      (resp/redirect-after-post (str "/startups/" (:website startup)))
       (startup startup))))
 
 (defn startup-delete [website]
