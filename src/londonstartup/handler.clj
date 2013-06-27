@@ -2,7 +2,8 @@
   (:require [compojure.handler :as handler]
             [compojure.route :as route]
             [londonstartup.models :as models]
-            [londonstartup.controllers.startups :as controllers]
+            [londonstartup.controllers.startups :as startup-controllers]
+            [londonstartup.controllers.home :as home-controllers]
             [ring.util.response :as resp]
             [noir.util.middleware :as nm]
             )
@@ -11,15 +12,20 @@
 
 ;;; Routing
 (defroutes app-routes
-  (GET "/" [] (resp/redirect "/startups"))
-  (GET "/startups" [] (controllers/startups))
-  (GET "/startups/:website" [website] (controllers/startup website))
-  (POST "/startups" [:as {startup :params}] (controllers/startup-new startup))
-  (PUT "/startups/:_website" [:as {startup :params}] (controllers/startup-update startup))
-  (DELETE "/startups/:website" [website] (controllers/startup-delete website))
-;;Forms
-  (GET "/add/startups" [] (controllers/add-startup-form))
-  (GET "/update/startups/:website" [website] (controllers/update-startup-form website))
+;;Home Page
+  (GET "/" [] (home-controllers/home))
+
+;; Startups Actions
+  (GET "/startups" [query] (startup-controllers/startups query))
+  (GET "/startups/:website" [website] (startup-controllers/startup website))
+  (POST "/startups" [:as {startup :params}] (startup-controllers/startup-new startup))
+  (PUT "/startups/:_website" [:as {startup :params}] (startup-controllers/startup-update startup))
+  (DELETE "/startups/:website" [website] (startup-controllers/startup-delete website))
+
+;; Startup Forms
+  (GET "/add/startups" [] (startup-controllers/add-startup-form))
+  (GET "/update/startups/:website" [website] (startup-controllers/update-startup-form website))
+
 ;;Static Resources
   (route/resources "/"))
 
