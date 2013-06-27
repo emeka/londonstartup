@@ -40,16 +40,41 @@
 (defn error-text [errors]
   [:span (string/join "" errors)])
 
-(defn startup-fields [{:keys [website name _id]}]
+(defn startup-fields [{:keys [website name accountId phone addressLine1 addressLine2 addressLine3 city county country postCode _id]}]
   ;(validate/on-error :name error-text)
   (list
-    [:div.control-group (label {:class "control-label"} :name "Name")
-     [:div.controls (text-field {:placeholder "Name"} :name name)]]
+    [:div.row-fluid [:div.span6 [:div.control-group (label {:class "control-label"} :name "Name")
+                                  [:div.controls (text-field {:placeholder "Name"} :name name)]]
 
-    [:div.control-group ;(validate/on-error :website error-text)
-     (label {:class "control-label"} :website "Website")
-     [:div.controls (text-field {:placeholder "Website"} :website website)]]
-    (hidden-field :_id _id)))
+                      [:div.control-group (label {:class "control-label"} :website "Website")
+                       [:div.controls (text-field {:placeholder "Website"} :website website)]]
+
+                      [:div.control-group (label {:class "control-label"} :accountId "Twitter")
+                       [:div.controls (text-field {:placeholder "Twitter Account"} :accountId accountId)]]
+
+                      [:div.control-group (label {:class "control-label"} :phone "Phone")
+                       [:div.controls (text-field {:placeholder "ex: +44 20 7123 1234"} :phone phone)]]
+
+                      ]
+     [:div.span6 [:div.control-group (label {:class "control-label"} :address "Address")
+                  [:div.controls (text-field {:placeholder "Address Line 1"} :addressLine1 addressLine1) [:br ]
+                   (text-field {:placeholder "Address Line 2"} :addressLine2 addressLine2) [:br ]
+                   (text-field {:placeholder "Address Line 3"} :addressLine3 addressLine3)
+                   ]
+                  ]
+      [:div.control-group (label {:class "control-label"} :city "City")
+       [:div.controls (text-field {:placeholder "ex: London"} :city city)]]
+      [:div.control-group (label {:class "control-label"} :county "County")
+       [:div.controls (text-field {:placeholder "ex: Greater London"} :county county)]]
+      [:div.control-group (label {:class "control-label"} :postCode "Post Code")
+       [:div.controls (text-field {:placeholder "ex: SW1W 9XX"} :postCode postCode)]]
+      [:div.control-group (label {:class "control-label"} :country "Country")
+       [:div.controls (text-field {:placeholder "ex: UK"} :country country)]]
+      ]
+     (hidden-field :_id _id)
+     ]
+
+    ))
 
 (defn startup-remove-form [{:keys [website]}]
   (when website
@@ -57,10 +82,10 @@
       (submit-button {:class "btn btn-danger"} "Delete"))))
 
 (defn startup-form [action method url startup]
-  (form-to [method url]
+  (form-to {:class "form-horizontal"} [method url]
     (startup-fields startup)
-    [:a.btn {:href url} "Cancel"]
-    (submit-button {:class "btn btn-primary"} action)
+    [:div.row-fluid [:div.span4 [:a.btn {:href url} "Cancel"]
+                      (submit-button {:class "btn btn-primary"} action)]]
     ))
 
 ;;Header
@@ -71,28 +96,30 @@
   [:small (update-link startup [:i.icon-edit ])])
 
 (defn startup-name [{:keys [name] :as startup}]
-  [:div.startup-header.span6 [:h2 (get-link startup name)]])
+  [:div.startup-header.span6 [:h2 (get-link startup name) [:small (update-link startup [:i.icon-edit ])]]])
 
 
 
 (defn startup-badges [startup]
-  [:div.startup-badges.span4.offset2 [:h2 (badge "icon-user" 13) (badge "icon-bullhorn" 2450) (badge "icon-heart" 200) [:small (update-link startup [:i.icon-edit])]]])
+  [:div.startup-badges.span4.offset2 [:h2 (badge "icon-user" 13) (badge "icon-bullhorn" 2450) (badge "icon-heart" 200)]])
 
 (defn startup-header [startup]
   [:div.row (startup-name startup) (startup-badges startup)])
 
 
 ;;Details
-(defn address [{:keys [name website] :as startup}]
-  [:address.span3 [:strong name] [:br ]
-   [:span "Belgrave House"] [:br ]
-   [:span "76 Buckingham Palace Rd"] [:br ]
-   [:span "London"] [:br ]
-   [:span "Greater London"] [:br ]
-   [:span "SW1W 9TQ"] [:br ] [:br ]
+(defn address [{:keys [website name accountId phone addressLine1 addressLine2 addressLine3 city county country postCode _id]}]
+  [:address.span3 [:strong "Address"] [:br ]
+   [:span addressLine1] [:br ]
+   [:span addressLine2] [:br ]
+   [:span addressLine3] [:br ]
+   [:span city] [:br ]
+   [:span county] [:br ]
+   [:span country] [:br ]
+   [:span postCode] [:br ] [:br ]
 
    [:strong "Phone"] [:br ]
-   [:span "020 7031 3000"] [:br ] [:br ]
+   [:span phone] [:br ] [:br ]
    [:strong "Website"] [:br ]
    (let [domain-name (string/replace website "http://" "")]
      (link-to (str "http://" domain-name) domain-name))
@@ -135,23 +162,21 @@
   (common/layout
     (startup-dashboard startup))) ;The url should be calculated from the route
 
-(defn startups-page [new-startup startups]
+(defn startups-page [startups query]
   (common/layout
-    [:header.jumbotron.subhead [:div.container [:h1 "London Startup Directory"]
-                                [:p.lead "The open startup reference in London."]
-                                [:a.btn.btn-large.btn-danger {:href "/add/startups"} "Add Your Startup Now!"]]]
+    {:navbar {:search {:query query}}}
     (startup-list startups)))
 
 ;;Form Pages
 
 (defn add-startup-page []
   (common/layout
+    {:navbar {:search {:enabled false}}}
     [:header.jumbotron.subhead [:div.container [:h1 "Add New Startup"]]]
     [:div.container-fluid [:div.row-fluid [:div.span12 (startup-form "Add" :post "/startups" {})]]])) ;The url should be calculated from the route
 
 (defn update-startup-page [{:keys [website] :as startup}]
   (common/layout
     [:header.container-fluid (startup-header startup)]
-    [:div.container-fluid [:div.row-fluid [:div.span12
-    (startup-form "Update" :put (str "/startups/" website) startup) ;The url should be calculated from the route
-    (startup-remove-form startup)]]]))
+    [:div.container-fluid [:div.row-fluid [:div.span12 (startup-form "Update" :put (str "/startups/" website) startup) ;The url should be calculated from the route
+                                           (startup-remove-form startup)]]]))

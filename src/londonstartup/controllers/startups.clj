@@ -14,8 +14,8 @@
         (catch Exception e (dissoc startup :_id))))
     startup))
 
-(defn startups [& new-startup]
-  (views/startups-page (first new-startup) (result/value (startup/startups))))
+(defn startups [query]
+  (views/startups-page (result/value (startup/startups)) query))
 
 (defn startup [website]
   (let [lookup-result (startup/website->startup website)]
