@@ -40,41 +40,27 @@
 (defn error-text [errors]
   [:span (string/join "" errors)])
 
-(defn startup-fields [{:keys [website name accountId phone addressLine1 addressLine2 addressLine3 city county country postCode _id]}]
+(defn startup-fields [{:keys [website name twitterAccount phone addressLine1 addressLine2 addressLine3 city county country postCode _id]}]
   ;(validate/on-error :name error-text)
   (list
-    [:div.row-fluid [:div.span6 [:div.control-group (label {:class "control-label"} :name "Name")
-                                  [:div.controls (text-field {:placeholder "Name"} :name name)]]
+    (bs/row
+      (bs/span6 (bs/control-group :name "Name" (text-field {:placeholder "Name"} :name name))
+        (bs/control-group :website "Website" (text-field {:placeholder "Website"} :website website))
+        (bs/control-group :twitterAccount "Twitter Account" (text-field {:placeholder "@Example"} :twitterAccount twitterAccount))
+        (bs/control-group :phone "Phone" (text-field {:placeholder "ex: +44 20 7123 1234"} :phone phone)))
 
-                      [:div.control-group (label {:class "control-label"} :website "Website")
-                       [:div.controls (text-field {:placeholder "Website"} :website website)]]
+      (bs/span6
+        (bs/control-group :address "Address"
+          (text-field {:placeholder "Address Line 1"} :addressLine1 addressLine1) [:br ]
+          (text-field {:placeholder "Address Line 2"} :addressLine2 addressLine2) [:br ]
+          (text-field {:placeholder "Address Line 3"} :addressLine3 addressLine3))
 
-                      [:div.control-group (label {:class "control-label"} :accountId "Twitter")
-                       [:div.controls (text-field {:placeholder "Twitter Account"} :accountId accountId)]]
+        (bs/control-group :city "City" (text-field {:placeholder "ex: London"} :city city))
+        (bs/control-group :county "County" (text-field {:placeholder "ex: Greater London"} :county county))
+        (bs/control-group :postCode "Post Code" (text-field {:placeholder "ex: SW1W 9XX"} :postCode postCode))
+        (bs/control-group :country "Country" (text-field {:placeholder "ex: UK"} :country country)))
 
-                      [:div.control-group (label {:class "control-label"} :phone "Phone")
-                       [:div.controls (text-field {:placeholder "ex: +44 20 7123 1234"} :phone phone)]]
-
-                      ]
-     [:div.span6 [:div.control-group (label {:class "control-label"} :address "Address")
-                  [:div.controls (text-field {:placeholder "Address Line 1"} :addressLine1 addressLine1) [:br ]
-                   (text-field {:placeholder "Address Line 2"} :addressLine2 addressLine2) [:br ]
-                   (text-field {:placeholder "Address Line 3"} :addressLine3 addressLine3)
-                   ]
-                  ]
-      [:div.control-group (label {:class "control-label"} :city "City")
-       [:div.controls (text-field {:placeholder "ex: London"} :city city)]]
-      [:div.control-group (label {:class "control-label"} :county "County")
-       [:div.controls (text-field {:placeholder "ex: Greater London"} :county county)]]
-      [:div.control-group (label {:class "control-label"} :postCode "Post Code")
-       [:div.controls (text-field {:placeholder "ex: SW1W 9XX"} :postCode postCode)]]
-      [:div.control-group (label {:class "control-label"} :country "Country")
-       [:div.controls (text-field {:placeholder "ex: UK"} :country country)]]
-      ]
-     (hidden-field :_id _id)
-     ]
-
-    ))
+      (hidden-field :_id _id))))
 
 (defn startup-remove-form [{:keys [website]}]
   (when website
@@ -84,9 +70,9 @@
 (defn startup-form [action method url startup]
   (form-to {:class "form-horizontal"} [method url]
     (startup-fields startup)
-    [:div.row-fluid [:div.span4 [:a.btn {:href url} "Cancel"]
-                      (submit-button {:class "btn btn-primary"} action)]]
-    ))
+    (bs/row
+      (bs/span4 [:a.btn {:href url} "Cancel"]
+        (submit-button {:class "btn btn-primary"} action)))))
 
 ;;Header
 (defn badge [icon value]
