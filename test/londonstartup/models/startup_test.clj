@@ -7,37 +7,6 @@
   (:use clojure.test)
   (import org.bson.types.ObjectId))
 
-
-;; Result test
-(deftest add-error
-  (let [init-result (result/result nil)
-        result1 (result/add-error init-result :website "Error1")
-        result2 (result/add-error result1 :website "Error2")
-        result3 (result/add-error result2 :name "Name Error")]
-    (is (= {:value nil :errors {:website ["Error1"]}} result1))
-    (is (= {:value nil :errors {:website ["Error1" "Error2"]}} result2))
-    (is (= {:value nil :errors {:website ["Error1" "Error2"] :name ["Name Error"]}} result3))))
-
-(deftest result
-  (is (= {:value nil} (result/result nil)))
-  (is (= {:value 3} (result/result 3))))
-
-(deftest error
-  (is (= {:errors {:website ["Error"]}} (result/error :website "Error"))))
-
-(deftest has-error?
-  (is (not (result/has-error? (result/result nil))))
-  (is (result/has-error? (result/add-error (result/result nil) :website "Error"))))
-
-(deftest errors
-  (is (nil? (result/errors (result/result nil))))
-  (is (= {:website ["Error"]} (result/errors (result/add-error (result/result nil) :website "Error")))))
-
-(deftest value
-  (is (nil? (result/value (result/result nil))))
-  (is (= 3 (result/value (result/result 3)))))
-
-
 ;; CRUD test
 (let [google-id (ObjectId.)
       yahoo-id (ObjectId.)
@@ -78,12 +47,17 @@
     (is (result/has-error? (startup/website->startup "www.doesnotexist.com"))))
 
   (deftest website-free?
-    (is (result/value (startup/website-free? "www.doesnotexist.com")))
-    (is (not (result/value (startup/website-free? "www.google.com")))))
+    (is (not (result/has-error? (startup/website-free? {:website "www.doesnotexist.com"}))))
+    (is (result/has-error? (startup/website-free? {:website "www.google.com"}))))
 
   (deftest name-free?
-    (is (result/value (startup/name-free? "New Inc.")))
-    (is (not (result/value (startup/name-free? "Google Inc.")))))
+    (is (not (result/has-error? (startup/name-free? {:name "New Inc."}))))
+    (is (result/has-error? (startup/name-free? {:name "Google Inc."}))))
+
+  (deftest id-free?
+    (is (not (result/has-error? (startup/id-free? {}))))
+    (is (not (result/has-error? (startup/id-free? {:_id (ObjectId.)}))))
+    (is (result/has-error? (startup/id-free? {:_id google-id}))))
 
   (deftest startups
     (is (= (list google yahoo) (result/value (startup/startups)))))
@@ -99,7 +73,9 @@
     (is (= 3 (result/value (startup/total)))))
 
   (deftest update!
-    (is (= google-id (:_id (result/value (startup/update! (merge google {:website "www.new.com"}))))))
+    (let [update-result (startup/update! (merge google {:website "www.new.com"}))]
+      (is (nil? (result/errors update-result)))
+      (is (= google-id (:_id (result/value update-result)))))
     (is (= "www.new.com" (:website (result/value (startup/id->startup google-id)))))
     (is (result/has-error? (startup/update! (merge google {:website "www.yahoo.com"}))))
     (is (result/has-error? (startup/update! (merge google {:name "Yahoo! Inc."}))))

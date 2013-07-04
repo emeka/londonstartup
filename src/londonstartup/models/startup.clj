@@ -1,8 +1,8 @@
 (ns londonstartup.models.startup
   (:require [monger.core :as mg]
             [monger.collection :as mc]
-            [noir.validation :as validate]
-            [londonstartup.common.result :as result])
+            [londonstartup.common.result :as result]
+            [londonstartup.common.validation :as validate])
   (import org.bson.types.ObjectId))
 
 
@@ -10,22 +10,14 @@
 
 
 ;; Validation
-(defn has-id [startup]
+(defn has-id? [startup]
   (let [id (:_id startup)]
     (and id (not-empty (str id)))))
 
-(def validation-rules
-  [[:website validate/has-value? "A startup must have a website"],
-   [:name validate/has-value? "A startup must have a name"]])
-
-(defn valid?
-  ([startup]
-    (reduce #(valid? startup %1 %2) (result/result startup) validation-rules))
-  ([startup result [field test msg]]
-    (if (test (field startup))
-      result
-      (result/add-error result field msg)
-      )))
+(defn valid? [startup]
+  (result/merge-error-> startup
+    (validate/has-value? :website "A startup must have a website")
+    (validate/has-value? :name "A startup must have a name")))
 
 ;; CRUD
 
@@ -36,53 +28,70 @@
   (let [lookup (mc/find-one-as-map collection {:_id id})]
     (if lookup
       (result/result lookup)
-      (result/error :website "Unknown startup ID"))))
+      (result/error lookup :website "Unknown startup ID"))))
 
 (defn website->startup [website]
   (let [lookup (mc/find-one-as-map collection {:website website})]
     (if lookup
       (result/result lookup)
-      (result/error :website "Unknown website"))))
+      (result/error lookup :website "Unknown website"))))
 
-(defn website-free? [website]
-  (result/result (= 0 (mc/count collection {:website website}))))
+(defn website-free? [{:keys [website] :as startup}]
+  (if (= 0 (mc/count collection {:website website}))
+    (result/result startup)
+    (result/error startup :website "The website already exists")))
 
-(defn name-free? [name]
-  (result/result (= 0 (mc/count collection {:name name}))))
+(defn name-free? [{:keys [name] :as startup}]
+  (if (= 0 (mc/count collection {:name name}))
+    (result/result startup)
+    (result/error startup :name "The name already exists")))
+
+(defn id-free? [{:keys [_id] :as startup}]
+  (if (or (not _id) (result/has-error? (id->startup _id)))
+    (result/result startup)
+    (result/error startup :_id "Startup entry already exists")))
 
 (defn startups []
   (result/result (mc/find-maps collection)))
 
+(defn generate-id [startup]
+  (if (has-id? startup)
+    (result/result startup)
+    (result/result (merge startup {:_id (ObjectId.)}))))
+
+(defn- add-raw! [startup]
+  (mc/insert-and-return collection startup))
+
 (defn add! [startup]
-  (let [validation-result (valid? startup)]
-    (if (not (result/has-error? validation-result))
-      (let [oid (if (has-id startup) (:_id startup) (ObjectId.))]
-        (if (nil? (result/value (id->startup oid)))
-          (if (result/value (website-free? (:website startup)))
-            (if (result/value (name-free? (:name startup)))
-              (result/result (mc/insert-and-return collection (merge startup {:_id oid})))
-              (result/error :name "Company name already in use."))
-            (result/error :website "Website already in use"))
-          (result/error :startup "Startup already exists")))
-      validation-result)))
+  (result/until-error-> startup
+    (valid?)
+    (id-free?)
+    (generate-id)
+    (website-free?)
+    (name-free?)
+    (add-raw!)))
+
+(defn- update-raw! [startup]
+  (try
+    (do
+      (let [update-result (mc/update-by-id collection (:_id startup) startup)]
+        (if (.getField update-result "updatedExisting")
+          (result/result startup)
+          (result/error startup :startup "Could not update"))))
+    (catch Exception e (result/error :startup "Could not update"))))
+
+(defn update-valid? [new-startup current-startup]
+  (if (or (= (:website new-startup) (:website current-startup)) (not (result/has-error? (website-free? new-startup))))
+    (if (or (= (:name new-startup) (:name current-startup)) (not (result/has-error? (name-free? new-startup))))
+      (result/result new-startup)
+      (result/error new-startup :name "Company name already in use."))
+    (result/error new-startup :website "Website already in use.")))
 
 (defn update! [startup]
-  (let [validation-result (valid? startup)]
-    (if (not (result/has-error? validation-result))
-      (when-let [id (:_id startup)]
-        (when-let [old-startup (result/value (id->startup id))]
-          (if (or (= (:website startup) (:website old-startup)) (result/value (website-free? (:website startup))))
-            (if (or (= (:name startup) (:name old-startup)) (result/value (name-free? (:name startup))))
-              (try (do
-                     (let [update-result (mc/update-by-id collection id startup)]
-                       (if (.getField update-result "updatedExisting")
-                         (result/result startup)
-                         (result/error :startup "Could not update"))))
-                (catch Exception e (result/error :startup "Could not update")))
-              (result/error :name "Company name already in use."))
-            (result/error :website "Website already in use."))))
-      validation-result)))
-
+  (result/until-error-> startup
+    (valid?)
+    (update-valid? (result/value (id->startup (:_id startup))))
+    (update-raw!)))
 
 (defn remove! [id]
   (result/result (mc/remove-by-id collection id)))
