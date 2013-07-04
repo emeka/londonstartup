@@ -1,6 +1,6 @@
 (ns londonstartup.views.bootstrap
   (:use [hiccup.page :only [include-css include-js html5]]
-        [hiccup.def :only [defhtml]]
+        [hiccup.def :only [defhtml defelem]]
         [hiccup.element :only [link-to]]
         [hiccup.form]))
 
@@ -48,9 +48,6 @@
 (defn span11 [& content] (span 11 content))
 (defn span12 [& content] (span 12 content))
 
-(defn control-group [id name & content]
+(defelem control-group [id name & content]
   [:div.control-group (label {:class "control-label"} id name)
-   [:div.controls content
-    ]
-   ]
-  )
+   [:div.controls content]])

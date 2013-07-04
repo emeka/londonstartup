@@ -39,8 +39,8 @@
 (defn has-error? [value]
   (contains? (result value) :errors ))
 
-(defn errors [errors]
-  (:errors errors))
+(defn errors [value]
+  (:errors value))
 
 (defn value [value]
   (:value value))
