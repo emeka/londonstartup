@@ -1,22 +1,25 @@
 (ns londonstartup.views.startups
-  (:require [noir.validation :as validate]
-            [clojure.string :as string]
+  (:require [clojure.string :as string]
             [londonstartup.views.common :as common]
-            [londonstartup.views.bootstrap :as bs])
+            [londonstartup.views.bootstrap :as bs]
+            [londonstartup.common.result :as result]
+            [londonstartup.common.validation :as validate])
   (:use hiccup.core
         hiccup.element
         hiccup.page
         hiccup.form
         hiccup.def))
 
-;;Validation
-;(defn valid? [{:keys [website name]}]
-;  (validate/rule (validate/has-value? website)
-;    [:website "A startup must have a website"])
-;  (validate/rule (validate/has-value? name)
-;    [:name "A startup must have a name"])
-;  ;(not (validate/errors? :website :name)) ;;TODO: valid? should be at view level.
-;  )
+
+;;Helpers
+(defn get-field [startup-result key & [default]]
+  (let [field-value (key (result/value startup-result))]
+    (if (and (not (nil? field-value)) (not= "" field-value))
+      field-value
+      default)))
+
+(defn get-errors [startup-result key]
+  (key (result/errors startup-result)))
 
 ;; Page Elements
 
@@ -38,14 +41,13 @@
 
 ;;Forms
 (defn error-text [errors]
-  [:span (string/join "" errors)])
+  (reduce #(conj %1 %2 [:br ]) [:span.help-inline ] errors))
 
-(defn startup-fields [{:keys [website name twitterAccount phone addressLine1 addressLine2 addressLine3 city county country postCode _id]}]
-  ;(validate/on-error :name error-text)
+(defn startup-fields [{:keys [website name twitterAccount phone addressLine1 addressLine2 addressLine3 city county country postCode _id]} errors]
   (list
     (bs/row
-      (bs/span6 (bs/control-group :name "Name" (text-field {:placeholder "Name"} :name name))
-        (bs/control-group :website "Website" (text-field {:placeholder "Website"} :website website))
+      (bs/span6 (bs/control-group :name "Name" (text-field {:placeholder "Name"} :name name) (validate/on-error errors :name error-text))
+        (bs/control-group :website "Website" (text-field {:placeholder "Website"} :website website) (validate/on-error errors :website error-text))
         (bs/control-group :twitterAccount "Twitter Account" (text-field {:placeholder "@Example"} :twitterAccount twitterAccount))
         (bs/control-group :phone "Phone" (text-field {:placeholder "ex: +44 20 7123 1234"} :phone phone)))
 
@@ -67,9 +69,9 @@
     (form-to [:delete (str "/startups/" website)] ;The url should be calculated from the route
       (submit-button {:class "btn btn-danger"} "Delete"))))
 
-(defn startup-form [action method url startup]
+(defn startup-form [action method url startup errors]
   (form-to {:class "form-horizontal"} [method url]
-    (startup-fields startup)
+    (startup-fields startup errors)
     (bs/row
       (bs/span4 [:a.btn {:href url} "Cancel"]
         (submit-button {:class "btn btn-primary"} action)))))
@@ -94,8 +96,8 @@
 
 
 ;;Details
-(defn address [{:keys [website name accountId phone addressLine1 addressLine2 addressLine3 city county country postCode _id]}]
-  [:address.span3 [:strong "Address"] [:br ]
+(defn address [{:keys [name addressLine1 addressLine2 addressLine3 city county country postCode]}]
+  [:address [:strong "Address"] [:br ]
    [:span addressLine1] [:br ]
    [:span addressLine2] [:br ]
    [:span addressLine3] [:br ]
@@ -103,18 +105,23 @@
    [:span county] [:br ]
    [:span country] [:br ]
    [:span postCode] [:br ] [:br ]
-
-   [:strong "Phone"] [:br ]
-   [:span phone] [:br ] [:br ]
-   [:strong "Website"] [:br ]
-   (let [domain-name (string/replace website "http://" "")]
-     (link-to (str "http://" domain-name) domain-name))
    ]
   )
 
+(defn phone [{:keys [phone]}]
+    [:span [:strong "Phone"] [:br ] [:span phone] [:br ] [:br ]])
+
+(defn website [{:keys [website]}]
+  [:span [:strong "Website"] [:br ]
+   (let [domain-name (string/replace website "http://" "")]
+     (link-to (str "http://" domain-name) domain-name)) [:br ] [:br ]])
+
+(defn twitterAccount [{:keys [twitterAccount]}]
+  [:span [:strong "Twitter"] [:br ] [:span twitterAccount] [:br ] [:br ]])
+
 ;;Details
 (defn location [{:keys [name website] :as startup}]
-  (str "<div class=\"span3\">
+  (str "<div>
                       <iframe width=\"300\" height=\"300\" frameborder=\"0\" scrolling=\"no\" marginheight=\"0\" marginwidth=\"0\"
                               src=\"https://maps.google.co.uk/maps?f=q&amp;source=s_q&amp;hl=en&amp;geocode=&amp;q=Google+London,+Buckingham+Palace+Road,+London&amp;aq=0&amp;oq=google+lon&amp;sll=51.48931,-0.08819&amp;sspn=1.061176,1.253815&amp;ie=UTF8&amp;hq=Google+London,+Buckingham+Palace+Road,+London&amp;t=m&amp;ll=51.494904,-0.146427&amp;spn=0.008016,0.012875&amp;z=15&amp;iwloc=near&amp;output=embed\"></iframe>
                       <br/>
@@ -134,8 +141,8 @@
   (when startup
     [:section.startup.container-fluid {:id (id startup)}
      (startup-header startup)
-     [:div.row (address startup)
-      (location startup)
+     [:div.row [:div.span3 (address startup) (phone startup) (website startup) (twitterAccount startup)]
+      [:div.span3 (location startup)]
       ]]
     ))
 
@@ -144,25 +151,30 @@
   (map #(startup-summary %) startups))
 
 ;; Pages
-(defn startup-page [{:keys [website] :as startup}]
+(defn startup-page [startup-result]
   (common/layout
-    (startup-dashboard startup))) ;The url should be calculated from the route
+    (startup-dashboard (result/value startup-result)))) ;The url should be calculated from the route
 
-(defn startups-page [startups query]
+(defn startups-page [startups-result query]
   (common/layout
     {:navbar {:search {:query query}}}
-    (startup-list startups)))
+    (startup-list (result/value startups-result))))
 
 ;;Form Pages
 
-(defn add-startup-page []
-  (common/layout
-    {:navbar {:search {:enabled false}}}
-    [:header.jumbotron.subhead [:div.container [:h1 "Add New Startup"]]]
-    [:div.container-fluid [:div.row-fluid [:div.span12 (startup-form "Add" :post "/startups" {})]]])) ;The url should be calculated from the route
+(defn add-startup-page [startup-result]
+  (let [startup (result/value startup-result)
+        errors (result/errors startup-result)]
+    (common/layout
+      {:navbar {:search {:enabled false}}}
+      [:header.jumbotron.subhead [:div.container [:h1 "Add New Startup"]]]
+      [:div.container-fluid [:div.row-fluid [:div.span12 (startup-form "Add" :post "/startups" startup errors)]]]))) ;The url should be calculated from the route
 
-(defn update-startup-page [{:keys [website] :as startup}]
-  (common/layout
-    [:header.container-fluid (startup-header startup)]
-    [:div.container-fluid [:div.row-fluid [:div.span12 (startup-form "Update" :put (str "/startups/" website) startup) ;The url should be calculated from the route
-                                           (startup-remove-form startup)]]]))
+(defn update-startup-page [startup-result & [default-website]]
+  (let [website (get-field startup-result :website default-website)
+        startup (result/value startup-result)
+        errors (result/errors startup-result)]
+    (common/layout
+      [:header.container-fluid (startup-header startup)]
+      [:div.container-fluid [:div.row-fluid [:div.span12 (startup-form "Update" :put (str "/startups/" website) startup errors) ;The url should be calculated from the route
+                                             (startup-remove-form startup)]]])))

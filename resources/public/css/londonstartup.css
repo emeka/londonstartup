@@ -24,3 +24,7 @@ header {
 .searchbar {
     padding-top: 40px;
 }
+
+.field-error {
+    color: red;
+}

@@ -6,3 +6,10 @@
     (if (and value (not= value ""))
       (result/result map)
       (result/error map key error-msg))))
+
+
+(defn on-error
+  "If the given field has an error, execute func and return its value"
+  [ errors field func]
+  (if-let [errs (field errors)]
+    (func errs)))

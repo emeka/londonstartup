@@ -19,7 +19,7 @@
   (GET "/startups" [query] (startup-controllers/startups query))
   (GET "/startups/:website" [website] (startup-controllers/startup website))
   (POST "/startups" [:as {startup :params}] (startup-controllers/startup-new startup))
-  (PUT "/startups/:_website" [:as {startup :params}] (startup-controllers/startup-update startup))
+  (PUT "/startups/:_website" [_website :as {startup :params}] (startup-controllers/startup-update startup _website))
   (DELETE "/startups/:website" [website] (startup-controllers/startup-delete website))
 
 ;; Startup Forms
