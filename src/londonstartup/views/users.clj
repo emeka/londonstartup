@@ -33,11 +33,14 @@
 (defn idref [user & suffix]
   (str "#" (id user (first suffix))))
 
-(defn get-link [{:keys [website]} & content]
-  (link-to (str "/users/" website) content))
+(defn get-link [{:keys [username]} & content]
+  (link-to (str "/users/" username) content))
 
-(defn update-link [{:keys [website]} & content]
-  (link-to (str "/update/users/" website) content))
+(defn update-link [{:keys [username]} & content]
+  (link-to (str "/update/users/" username) content))
+
+(defn add-link [content]
+  (link-to "/add/users" content))
 
 ;;Forms
 (defn error-text [errors]
@@ -137,7 +140,7 @@
     (common/layout
       {:navbar {:search {:enabled false}}}
       [:header.jumbotron.subhead [:div.container [:h1 "Add New user"]]]
-      [:div.container-fluid [:div.row-fluid [:div.span12 (user-form "Add" :post "/users" user errors)]]]))) ;The url should be calculated from the route
+      [:div.container-fluid [:div.row-fluid [:div.span12 (add-link   )]]]))) ;The url should be calculated from the route
 
 (defn update-user-page [user-result & [default-website]]
   (let [website (get-field user-result :website default-website)
