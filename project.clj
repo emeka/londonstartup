@@ -1,5 +1,5 @@
 (defproject londonstartup "0.1.0-SNAPSHOT"
-  :description "London Startup Directory"
+  :description "London Startup Directory "
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [lib-noir "0.6.4"]
                  [compojure "1.1.5"]
