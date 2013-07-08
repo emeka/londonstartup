@@ -54,7 +54,7 @@
 (defn startups []
   (result/result (mc/find-maps collection)))
 
-(defn generate-id [startup]
+(defn generate-id-if-needed [startup]
   (if (has-id? startup)
     (result/result startup)
     (result/result (merge startup {:_id (ObjectId.)}))))
@@ -66,7 +66,7 @@
   (result/until-error-> startup
     (valid?)
     (id-free?)
-    (generate-id)
+    (generate-id-if-needed)
     (website-free?)
     (name-free?)
     (add-raw!)))

@@ -3,7 +3,9 @@
             [compojure.route :as route]
             [londonstartup.models :as models]
             [londonstartup.controllers.startups :as startup-controllers]
+            [londonstartup.controllers.users :as user-controllers]
             [londonstartup.controllers.home :as home-controllers]
+            [londonstartup.controllers.login :as login-controllers]
             [ring.util.response :as resp]
             [noir.util.middleware :as nm]
             )
@@ -25,6 +27,20 @@
 ;; Startup Forms
   (GET "/add/startups" [] (startup-controllers/add-startup-form))
   (GET "/update/startups/:website" [website] (startup-controllers/update-startup-form website))
+
+;; Users Actions
+  (GET "/users" [query] (user-controllers/users query))
+  (GET "/users/:username" [username] (user-controllers/user username))
+  (POST "/users" [:as {user :params}] (user-controllers/user-new user))
+  (PUT "/users/:_username" [_username :as {user :params}] (user-controllers/user-update user _username))
+  (DELETE "/users/:username" [username] (user-controllers/user-delete username))
+
+;; Users Forms
+  (GET "/add/users" [] (user-controllers/add-user-form))
+  (GET "/update/users/:username" [username] (user-controllers/update-user-form username))
+
+;;Log In
+  (GET "/login" [& auth] (login-controllers/login [auth]))
 
 ;;Static Resources
   (route/resources "/"))
