@@ -2,9 +2,8 @@
   (:require [ring.util.response :as resp]
             [londonstartup.common.result :as result]
             [londonstartup.services.twitter :as twitter]
-            [londonstartup.models.users :users ]
-            [noir.session :as session])
-  (import org.bson.types.ObjectId))
+            [londonstartup.models.users :as users ]
+            [noir.session :as session]))
 
 
 
