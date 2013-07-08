@@ -53,7 +53,7 @@
 (defn users []
   (result/result (mc/find-maps collection)))
 
-(defn generate-id [user]
+(defn generate-id-if-needed [user]
   (if (has-id? user)
     (result/result user)
     (result/result (merge user {:_id (ObjectId.)}))))
@@ -65,7 +65,7 @@
   (result/until-error-> user
     (valid?)
     (id-free?)
-    (generate-id)
+    (generate-id-if-needed)
     (username-free?)
     (add-raw!)))
 

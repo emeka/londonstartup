@@ -5,6 +5,7 @@
             [londonstartup.controllers.startups :as startup-controllers]
             [londonstartup.controllers.users :as user-controllers]
             [londonstartup.controllers.home :as home-controllers]
+            [londonstartup.controllers.login :as login-controllers]
             [ring.util.response :as resp]
             [noir.util.middleware :as nm]
             )
@@ -37,6 +38,9 @@
 ;; Users Forms
   (GET "/add/users" [] (user-controllers/add-user-form))
   (GET "/update/users/:username" [username] (user-controllers/update-user-form username))
+
+;;Log In
+  (GET "/login" [& auth] (login-controllers/login [auth]))
 
 ;;Static Resources
   (route/resources "/"))

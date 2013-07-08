@@ -62,9 +62,7 @@
     (is (= 3 (result/value (users/total))))
     (is (result/has-error? (users/add! user3)))
     (is (= 3 (result/value (users/total))))
-    (is (result/has-error? (users/add! {:username "Other"})))
-    (is (= 3 (result/value (users/total))))
-    (is (result/has-error? (users/add! {:username "Github"})))
+    (is (result/has-error? (users/add! {:username "User1"})))
     (is (= 3 (result/value (users/total)))))
 
   (deftest update!
