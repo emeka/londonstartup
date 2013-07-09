@@ -19,10 +19,13 @@
   (put! :user user))
 
 (defn user-logged? []
-  (get :user))
+  (get :user ))
 
 (defn user-logout! []
-  (remove! :user))
+  (remove! :user ))
 
-(defn user []
-  (get :user))
+(defn username []
+  (get-in (get :user ) [:auth :twitter :screen_name ]))
+
+(defn session []
+  @noir.session/*noir-session*)

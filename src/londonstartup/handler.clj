@@ -61,9 +61,12 @@
 (defn redirect-to-login [{:keys [uri]}]
   (resp/redirect (str "/login?uri=" uri)))
 
+(defn user-logged? [req]
+  (session/user-logged?))
+
 (def app
   ;;The first parameter of app-handler must be a sequence
-  (nm/app-handler [app-routes] :access-rules [{:on-fail redirect-to-login :rules [session/user-logged?]}]))
+  (nm/app-handler [app-routes] :access-rules [{:on-fail redirect-to-login :rules [user-logged?]}]))
 
 (defn init []
   (models/initialize))
