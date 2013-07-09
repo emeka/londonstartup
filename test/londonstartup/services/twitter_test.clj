@@ -13,8 +13,8 @@
 ;(deftest user-show
 ;  (is (= "" (users-show :oauth-creds twitter/credentials :params {:screen-name "lastfm"}))))
 
-(deftest consumer
-  (is (not (nil? t/consumer))))
+(deftest authentication-consumer
+  (is (not (nil? t/authentication-consumer))))
 
 (deftest request-token
   (is (not (result/has-error? (t/request-token "http://staging.startupdirectory.org/login")))))

@@ -16,27 +16,28 @@
 
 
 ;;Login
-(def consumer (oauth/make-consumer
-                app-consumer-key
-                app-consumer-secret
-                "http://api.twitter.com/oauth/request_token"
-                "http://api.twitter.com/oauth/access_token"
-                "http://api.twitter.com/oauth/authorize"
-                :hmac-sha1 ))
+(def authentication-consumer (oauth/make-consumer
+                               app-consumer-key
+                               app-consumer-secret
+                               "http://api.twitter.com/oauth/request_token"
+                               "http://api.twitter.com/oauth/access_token"
+                               "http://api.twitter.com/oauth/authenticate"
+                               :hmac-sha1 ))
 
 (defn request-token [callback]
   (try
-    (result/result (oauth/request-token consumer callback))
-    (catch Exception e (result/error {:callback callback :consumer consumer} :request-token (str "Could not get request-token. " e)))))
+    (result/result (oauth/request-token authentication-consumer callback))
+    (catch Exception e (result/error {:callback callback :authentication-consumer authentication-consumer}
+                         :request-token (str "Could not get request-token. " e)))))
 
 (defn approval-url [request-token]
   (try
-    (result/result (oauth/user-approval-uri consumer (:oauth_token request-token)))
+    (result/result (oauth/user-approval-uri authentication-consumer (:oauth_token request-token)))
     (catch Exception e (result/error {:request-token request-token} :approval-url (str "Could not get approval-url. " e)))))
 
 (defn access-token-secret [request-token verifier]
   (try
-    (result/result (oauth/access-token consumer request-token verifier))
+    (result/result (oauth/access-token authentication-consumer request-token verifier))
     (catch Exception e (result/error {:request-token request-token :verifier verifier} :access-token-secret (str "Could not get access-token-secret. " e)))))
 
 
