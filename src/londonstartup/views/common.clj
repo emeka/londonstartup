@@ -1,4 +1,6 @@
 (ns londonstartup.views.common
+  (:require [londonstartup.environment :as env]
+            [londonstartup.services.session :as session])
   (:use [hiccup.page :only [include-css include-js html5]]
         [hiccup.def :only [defhtml]]
         [hiccup.element :only [link-to]]
@@ -38,9 +40,19 @@
       (form-to {:class "navbar-search"} [:get "/startups"]
         (text-field {:placeholder "Search" :class "span4"} :query query)))))
 
-(defn navbar-login [& username]
-  [:form.navbar-form.pull-right [:input#twitterId {:type "text" :placeholder "@TwitterId"}]
-   [:button.btn {:type "submit"} "Sign in"]])
+(defn navbar-login []
+  (if (session/user-logged?)
+    (form-to {:class "navbar-form pull-right"} [:get "/logout"]
+      [:button.btn {:type "submit"} (str "Sign out " (session/username))])
+    (form-to {:class "navbar-form pull-right"} [:get "/login"]
+      [:button.btn {:type "submit"} [:span [:img {:src "/img/bird_blue_16.png"}] " Sign in with Twitter"]])
+    ))
+
+;defn navbar-login [& username]
+;  (if (session/user-logged?)
+;    [:span.pull-right "Welcome " (session/username) [:a.btn {:href "/logout"} "Sign out"]]
+;    [:a.btn.pull-right {:href "/login"} [:img {:src "/img/bird_blue_16.png"}] " Sign in with Twitter"]))
+
 
 (defn navbar [config]
   (let [search-config (:search config)]
@@ -90,4 +102,4 @@
                :href "http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-57-precomposed.png"}]
        [:link {:rel "shortcut icon" :href "http://twitter.github.io/bootstrap/assets/ico/favicon.png"}]]
 
-      [:body (navbar navbar-config) [:div#wrapper content] javascript])))
+      [:body (navbar navbar-config) (if env/debug? [:div.row.debug [:div {:class "span12.hide"} (str (session/session))]]) [:div#wrapper content] javascript])))
