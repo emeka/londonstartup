@@ -140,7 +140,7 @@
     (common/layout
       {:navbar {:search {:enabled false}}}
       [:header.jumbotron.subhead [:div.container [:h1 "Add New user"]]]
-      [:div.container-fluid [:div.row-fluid [:div.span12 (add-link   )]]]))) ;The url should be calculated from the route
+      [:div.container-fluid [:div.row-fluid [:div.span12 (user-form "Add" :post "/users" user errors)]]]))) ;The url should be calculated from the route
 
 (defn update-user-page [user-result & [default-website]]
   (let [website (get-field user-result :website default-website)

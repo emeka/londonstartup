@@ -1,4 +1,6 @@
 (ns londonstartup.views.common
+  (:require [londonstartup.environment :as env]
+            [noir.session :as session])
   (:use [hiccup.page :only [include-css include-js html5]]
         [hiccup.def :only [defhtml]]
         [hiccup.element :only [link-to]]
@@ -90,4 +92,4 @@
                :href "http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-57-precomposed.png"}]
        [:link {:rel "shortcut icon" :href "http://twitter.github.io/bootstrap/assets/ico/favicon.png"}]]
 
-      [:body (navbar navbar-config) [:div#wrapper content] javascript])))
+      [:body (navbar navbar-config) (if env/debug? [:div.row.debug [:div {:class "span12.hide"} (str {:user (session/get :user)})]])[:div#wrapper content] javascript])))

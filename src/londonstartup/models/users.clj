@@ -12,7 +12,9 @@
                   :username nil
                   :auth authentication}))
 
-;; Validation
+(defn username [user]
+  (:username user))
+
 ;; Validation
 (defn has-id? [user]
   (let [id (:_id user)]
