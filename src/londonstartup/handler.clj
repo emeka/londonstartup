@@ -50,7 +50,7 @@
   (GET "/update/users/:username" [username] (nr/restricted (user-controllers/update-user-form username)))
 
   ;;Log In
-  (GET "/login" [uri oauth_token oauth_verifier] (auth-controllers/login uri oauth_token oauth_verifier))
+  (GET "/login" [& params] (auth-controllers/login params))
 
   ;;Log Out
   (GET "/logout" [] (auth-controllers/logout))
