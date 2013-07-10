@@ -15,7 +15,7 @@
   (let [uri (if uri uri "/")]
     (cond
       (session/user-logged?) (resp/redirect uri)
-      (not (nil? denied)) (str "ACCESS DENIED")
+      (not (nil? denied)) (do (session/remove! :request-token) (session/flash! "ACCESS DENIED") (views/login-page))
       (or (not oauth_token) (not oauth_verifier)) (let [request-token (twitter/request-token (callback uri))]
                                                     (if (not (result/has-error? request-token))
                                                       (let [request-token (result/value request-token)]

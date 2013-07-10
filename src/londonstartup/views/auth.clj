@@ -11,5 +11,11 @@
         hiccup.def))
 
 
-;Access denied
+(defn login-form []
+  [:div.login [:h1 "Startup Directory uses Twitter for Authentication"]
+   [:a.btn {:href "/login"} [:span [:img {:src "/img/bird_blue_16.png"}] " Sign in with Twitter"]]])
 
+(defn login-page []
+  (common/layout
+    {:navbar {:search {:enabled false}} :login {:enabled false}}
+    [:div.container-fluid [:div.row-fluid [:div.span6.offset3 (login-form)]]]))

@@ -29,3 +29,9 @@
 
 (defn session []
   @noir.session/*noir-session*)
+
+(defn flash! [message]
+  (ns/flash-put! :message message))
+
+(defn flash []
+  (ns/flash-get :message))
