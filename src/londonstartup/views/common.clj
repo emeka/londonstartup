@@ -45,9 +45,9 @@
   (let [config (:login config)
         enabled (:enabled config true)]
     (if enabled
-      (if (session/user-logged?)
+      (if-let [user (session/get :user)]
         (form-to {:class "navbar-form pull-right"} [:get "/logout"]
-          [:button.btn {:type "submit"} (str "Sign out " (session/username))])
+          [:button.btn {:type "submit"} (str "Sign out " (:username user))])
         (form-to {:class "navbar-form pull-right"} [:get "/login"]
           (hidden-field :auto "true")
           [:button.btn {:type "submit"} [:span [:img {:src "/img/bird_blue_16.png"}] " Sign in with Twitter"]])

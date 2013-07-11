@@ -15,21 +15,6 @@
 (defn remove! [k]
   (ns/remove! k))
 
-(defn user-login! [user]
-  (put! :user user))
-
-(defn user-logged? []
-  (not (nil? (get :user ))))
-
-(defn user-logout! []
-  (remove! :user ))
-
-(defn user []
-  (get :user))
-
-(defn username []
-  (get-in (get :user ) [:auth :twitter :screen_name ]))
-
 (defn flash! [message]
   (ns/flash-put! :message message))
 

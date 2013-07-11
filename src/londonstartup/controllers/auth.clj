@@ -21,7 +21,7 @@
       (first (result/value users-result)))))
 
 (defn update-user! [db-user session-user]
-  ; (if (not (= (get-in session-user [:auth :twitter ]) (get-in db-user [:auth :twitter ])))
+  ; (if (not (= (get-in session-user [:auth :twitter ]) (get-in db-user [:auth :twitter ])))  ;TODO fix to not call if not necessary
   (users/update! (merge db-user session-user)))
 
 (defn get-request-token [uri]
@@ -37,7 +37,7 @@
 (defn login [uri oauth_token oauth_verifier denied auto]
   (let [uri (if uri uri "/")]
     (cond
-      (session/user-logged?) (resp/redirect uri)
+      (session/get :user) (resp/redirect uri)
       (not (nil? denied)) (do (session/remove! :request-token ) (session/flash! "ACCESS DENIED") (views/login-page))
       (nil? auto) (views/login-page)
       (or (not oauth_token) (not oauth_verifier)) (if-let [request-token (get-request-token uri)]
@@ -51,17 +51,23 @@
               (if (= oauth_token (:oauth_token request-token))
                 (if-let [twitter_auth (get-twitter-auth request-token oauth_verifier)]
                   (let [session-user (twitter-auth->user twitter_auth)]
-                    (session/user-login! session-user)
+
                     (if-let [db-user (find-user session-user)]
                       (do
-                        (update-user! db-user session-user)
-                        (resp/redirect uri))
-                      (do
-                        (users/add! session-user)
-                        (resp/redirect "/signup"))))
+                        (if (not (result/has-error? (update-user! db-user session-user)))
+                          (do
+                            (session/put! :user db-user)
+                            (resp/redirect uri))
+                          (str "ERROR: Cannot update use")))
+                      (let [user-result (users/add! session-user)]
+                        (if (not (result/has-error? user-result))
+                          (do
+                            (session/put! :user (result/value user-result))
+                            (resp/redirect (str "/signup?uri=" uri)))
+                          (str "ERROR: cannot add user")))))
                   (str "ERROR: cannot get twitter-auth"))
                 (str "ERROR: oauth_tokens are different"))))))
 
 (defn logout []
-  (session/user-logout!)
+  (session/remove! :user)
   (resp/redirect "/"))

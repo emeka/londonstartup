@@ -38,17 +38,19 @@
   (GET "/add/startups" [] (nr/restricted (startup/add-startup-form)))
   (GET "/update/startups/:website" [website] (nr/restricted (startup/update-startup-form website)))
 
-  ;; Users Actions
-  (GET "/users" [query] (user/users query))
-  (GET "/users/:username" [username] (user/user username))
-  ;(GET "/users/:username/profile" [username] (user/user-profile username))
-  (POST "/users" [uri :as {user :params}] (user/user-new user uri))
-  (PUT "/users/:_username" [_username :as {user :params}] (user/user-update user _username))
-  (DELETE "/users/:username" [username] (user/user-delete username))
+  ;; User Admin
+  (GET "/users" [query] (nr/restricted (user/users query)))
+  (GET "/users/:username" [username] (nr/restricted (user/user username))) ; == profile
+  (GET "/users/:username/settings" [username uri] (nr/restricted (user/user-settings username uri)))
+  (PUT "/users/:_username/settings" [_username uri :as {settings :params}] (nr/restricted (user/user-settings-update settings uri _username)))
+  (DELETE "/users/:username" [username] (nr/restricted (user/user-delete username)))
+
+  ;; User Settings
+  (GET "/settings" [] (nr/restricted (user/settings)))
+  (PUT "/settings" [:as {settings :params}] (user/settings-update settings))
 
   ;; Users Forms
   (GET "/signup" [uri] (nr/restricted (user/signup uri)))
-  (GET "/update/users/:username" [username] (nr/restricted (user/update-user-form username)))
 
   ;;Log In
   (GET "/login" [uri oauth_token oauth_verifier denied auto] (auth/login uri oauth_token oauth_verifier denied auto))
@@ -63,7 +65,7 @@
   (resp/redirect (str "/login?auto=true&uri=" uri)))
 
 (defn user-logged? [req]
-  (session/user-logged?))
+  (session/get :user))
 
 (def app
   ;;The first parameter of app-handler must be a sequence

@@ -37,8 +37,11 @@
 (defn get-link [{:keys [username]} & content]
   (link-to (str "/users/" username) content))
 
-(defn update-link [{:keys [username]} & content]
-  (link-to (str "/update/users/" username) content))
+(defn settings-url [{:keys [username]}]
+  (str "/users/" username "/settings"))
+
+(defn settings-link [user & content]
+  (link-to (settings-url user) content))
 
 (defn add-link [content]
   (link-to "/add/users" content))
@@ -47,14 +50,14 @@
 (defn error-text [errors]
   (reduce #(conj %1 %2 [:br ]) [:span.help-inline ] errors))
 
-(defn user-fields [{:keys [username website githubAccount linkdedInAccount googlePlusAccount _id]} errors]
+(defn user-fields [{:keys [username website githubAccount linkedInAccount googlePlusAccount _id]} errors]
   (list
     (bs/row
       (bs/span6
         ;(bs/control-group :username "Username" (text-field {:class "uneditable-input" :placeholder ""} :username username) (validate/on-error errors :username error-text))
         ;(bs/control-group :website "Website" (text-field {:class "uneditable-input"  :placeholder "www.example.com"} :website website) (validate/on-error errors :website error-text))
         (bs/control-group :githubAccount "Github" (text-field {:placeholder "Account name"} :githubAccount githubAccount))
-        (bs/control-group :linkdedInAccount "LinkedIn" (text-field {:placeholder "Account name"} :linkdedInAccount linkdedInAccount))
+        (bs/control-group :linkedInAccount "LinkedIn" (text-field {:placeholder "Account name"} :linkedInAccount linkedInAccount))
         (bs/control-group :googlePlusAccount "Google +" (text-field {:placeholder "Account name"} :googlePlusAccount googlePlusAccount)))
       (hidden-field :_id _id))))
 
@@ -75,10 +78,10 @@
   [:small (bs/icon icon) " " value " "])
 
 (defn user-edit-button [user]
-  [:small (update-link user [:i.icon-edit ])])
+  [:small (settings-link user [:i.icon-edit ])])
 
 (defn user-username [{:keys [username] :as user}]
-  [:div.user-header.span6 [:h2 (get-link user username) [:small (update-link user [:i.icon-edit ])]]])
+  [:div.user-header.span6 [:h2 (get-link user username) [:small (settings-link user [:i.icon-edit ])]]])
 
 (defn user-badges [user]
   [:div.user-badges.span4.offset2 [:h2 (badge "icon-user" 13) (badge "icon-bullhorn" 2450) (badge "icon-heart" 200)]])
@@ -89,14 +92,14 @@
 
 ;;Details
 (defn field [name value]
-  (when value
+  (when (not (empty? value))
     [:span [:strong name] [:br ] [:span value] [:br ] [:br ]]))
 
 (defn phone [{:keys [phone]}]
   (field "Phone" phone))
 
 (defn website [{:keys [website]}]
-  (when website
+  (when (not (empty? website))
     (let [domain-name (string/replace website "http://" "")
           link (link-to (str "http://" domain-name) domain-name)]
       (field "Website" link))))
@@ -143,33 +146,28 @@
     {:navbar {:search {:query query}}}
     (user-list (result/value users-result))))
 
-;;Form Pages
+;;Settings
 
-(defn signup-form [{:keys [username] :as user} errors]
-  [:div.row-fluid [:div.span6.offset3 [:div.module [:h1 "Please tell us more about you:"]
-                                                   (user-form "Update" :put (str "/users/" username) user errors)]]])
-
-(defn profile-form [{:keys [username] :as user} errors]
-  [:div.row-fluid [:div.span6.offset3 [:div.module [:h1 "Update your profile:"]
-                                                   (user-form "Update" :put (str "/users/" username) user errors)]]])
-
-
+(defn settings-form [user message button-text errors]
+  [:div.row-fluid [:div.span6.offset3 [:div.module [:h1 message]
+                                       (user-form button-text :put (settings-url user) user errors)]]])
 (defn debug [value]
   (if env/debug? [:div.row.debug [:div {:class "span12.hide"} (str value)]]))
 
-(defn signup-page [user-result uri]
+(defn- settings-page-template [user-result uri header message button-text]
   (let [user (result/value user-result)
         errors (result/errors user-result)]
     (common/layout
       {:navbar {:search {:enabled false} :login {:enabled false}}}
-      [:header.jumbotron.subhead [:div.container [:h1 (str "Welcome " (:username user))]]]
-      [:div.container-fluid (signup-form user errors)])))
-
-(defn update-user-page [user-result & [default-username]]
-  (let [username (get-field user-result :username default-username)
-        user (result/value user-result)
-        errors (result/errors user-result)]
-    (common/layout
-      [:header.jumbotron.subhead [:div.container [:h1 (str (:username user))]]]
+      [:header.jumbotron.subhead [:div.container [:h1 header]]]
       (debug user)
-      [:div.container-fluid (profile-form user errors)])))
+      (debug errors)
+      [:div.container-fluid (settings-form user message button-text errors)])))
+
+(defn signup-page [user-result uri]
+  (let [username (:username (result/value user-result))]
+    (settings-page-template user-result uri (str "Welcome " username) "Please tell us more about you:" "Create Account")))
+
+(defn settings-page [user-result uri & [default-username]]
+  (let [username (:username (result/value user-result) default-username)]
+    (settings-page-template user-result uri (str username) "Update your profile:" "Update")))
