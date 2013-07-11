@@ -3,7 +3,8 @@
             [londonstartup.views.common :as common]
             [londonstartup.views.bootstrap :as bs]
             [londonstartup.common.result :as result]
-            [londonstartup.common.validation :as validate])
+            [londonstartup.common.validation :as validate]
+            [londonstartup.environment :as env])
   (:use hiccup.core
         hiccup.element
         hiccup.page
@@ -46,15 +47,15 @@
 (defn error-text [errors]
   (reduce #(conj %1 %2 [:br ]) [:span.help-inline ] errors))
 
-(defn user-fields [{:keys [website username twitterAccount githubAccount linkdedInAccount phone _id]} errors]
+(defn user-fields [{:keys [username website githubAccount linkdedInAccount googlePlusAccount _id]} errors]
   (list
     (bs/row
-      (bs/span6 (bs/control-group :username "username" (text-field {:placeholder ""} :username username) (validate/on-error errors :username error-text))
-        (bs/control-group :website "Website" (text-field {:placeholder "Website"} :website website) (validate/on-error errors :website error-text))
-        (bs/control-group :twitterAccount "Twitter Account" (text-field {:placeholder "@Example"} :twitterAccount twitterAccount))
-        (bs/control-group :githubAccount "Github" (text-field {:placeholder "@Example"} :githubAccount githubAccount))
-        (bs/control-group :linkdedInAccount "LinkedIn" (text-field {:placeholder "Example"} :linkdedInAccount linkdedInAccount))
-        (bs/control-group :phone "Phone" (text-field {:placeholder "ex: +44 20 7123 1234"} :phone phone)))
+      (bs/span6
+        ;(bs/control-group :username "Username" (text-field {:class "uneditable-input" :placeholder ""} :username username) (validate/on-error errors :username error-text))
+        ;(bs/control-group :website "Website" (text-field {:class "uneditable-input"  :placeholder "www.example.com"} :website website) (validate/on-error errors :website error-text))
+        (bs/control-group :githubAccount "Github" (text-field {:placeholder "Account name"} :githubAccount githubAccount))
+        (bs/control-group :linkdedInAccount "LinkedIn" (text-field {:placeholder "Account name"} :linkdedInAccount linkdedInAccount))
+        (bs/control-group :googlePlusAccount "Google +" (text-field {:placeholder "Account name"} :googlePlusAccount googlePlusAccount)))
       (hidden-field :_id _id))))
 
 (defn user-remove-form [{:keys [username]}]
@@ -87,20 +88,30 @@
 
 
 ;;Details
+(defn field [name value]
+  (when value
+    [:span [:strong name] [:br ] [:span value] [:br ] [:br ]]))
+
 (defn phone [{:keys [phone]}]
-  [:span [:strong "Phone"] [:br ] [:span phone] [:br ] [:br ]])
+  (field "Phone" phone))
 
 (defn website [{:keys [website]}]
-  [:span [:strong "Website"] [:br ]
-   (let [domain-name (string/replace website "http://" "")]
-     (link-to (str "http://" domain-name) domain-name)) [:br ] [:br ]])
+  (when website
+    (let [domain-name (string/replace website "http://" "")
+          link (link-to (str "http://" domain-name) domain-name)]
+      (field "Website" link))))
 
 (defn twitterAccount [{:keys [twitterAccount]}]
-  [:span [:strong "Twitter"] [:br ] [:span twitterAccount] [:br ] [:br ]])
+  (field "Twitter" twitterAccount))
+
 (defn githubAccount [{:keys [githubAccount]}]
-  [:span [:strong "Github"] [:br ] [:span githubAccount] [:br ] [:br ]])
+  (field "Github" githubAccount))
+
 (defn linkedInAccount [{:keys [linkedInAccount]}]
-  [:span [:strong "LinkedIn"] [:br ] [:span linkedInAccount] [:br ] [:br ]])
+  (field "LinkedIn" linkedInAccount))
+
+(defn googlePlusAccount [{:keys [googlePlusAccount]}]
+  (field "Google Plus" googlePlusAccount))
 
 ;;Details
 
@@ -114,7 +125,7 @@
   (when user
     [:section.user.container-fluid {:id (id user)}
      (user-header user)
-     [:div.row [:div.span3 (website user) (twitterAccount user) (githubAccount user) (linkedInAccount user) (phone user)]
+     [:div.row [:div.span3 (website user) (twitterAccount user) (githubAccount user) (linkedInAccount user) (googlePlusAccount user) (phone user)]
       ]]
     ))
 
@@ -134,19 +145,31 @@
 
 ;;Form Pages
 
-(defn add-user-page [user-result]
+(defn signup-form [{:keys [username] :as user} errors]
+  [:div.row-fluid [:div.span6.offset3 [:div.module [:h1 "Please tell us more about you:"]
+                                                   (user-form "Update" :put (str "/users/" username) user errors)]]])
+
+(defn profile-form [{:keys [username] :as user} errors]
+  [:div.row-fluid [:div.span6.offset3 [:div.module [:h1 "Update your profile:"]
+                                                   (user-form "Update" :put (str "/users/" username) user errors)]]])
+
+
+(defn debug [value]
+  (if env/debug? [:div.row.debug [:div {:class "span12.hide"} (str value)]]))
+
+(defn signup-page [user-result uri]
   (let [user (result/value user-result)
         errors (result/errors user-result)]
     (common/layout
-      {:navbar {:search {:enabled false}}}
-      [:header.jumbotron.subhead [:div.container [:h1 "Add New user"]]]
-      [:div.container-fluid [:div.row-fluid [:div.span12 (user-form "Add" :post "/users" user errors)]]]))) ;The url should be calculated from the route
+      {:navbar {:search {:enabled false} :login {:enabled false}}}
+      [:header.jumbotron.subhead [:div.container [:h1 (str "Welcome " (:username user))]]]
+      [:div.container-fluid (signup-form user errors)])))
 
-(defn update-user-page [user-result & [default-website]]
-  (let [website (get-field user-result :website default-website)
+(defn update-user-page [user-result & [default-username]]
+  (let [username (get-field user-result :username default-username)
         user (result/value user-result)
         errors (result/errors user-result)]
     (common/layout
-      [:header.container-fluid (user-header user)]
-      [:div.container-fluid [:div.row-fluid [:div.span12 (user-form "Update" :put (str "/users/" website) user errors) ;The url should be calculated from the route
-                                             (user-remove-form user)]]])))
+      [:header.jumbotron.subhead [:div.container [:h1 (str (:username user))]]]
+      (debug user)
+      [:div.container-fluid (profile-form user errors)])))

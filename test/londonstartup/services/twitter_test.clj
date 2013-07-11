@@ -22,4 +22,4 @@
 (deftest approval-url
   (let [request-token (result/value (t/request-token "http://staging.startupdirectory.org/login"))
         url (result/value (t/approval-url request-token))]
-    (is (= (str "http://api.twitter.com/oauth/authorize?oauth_token=" (:oauth_token request-token)) url))))
+    (is (= (str "http://api.twitter.com/oauth/authenticate?oauth_token=" (:oauth_token request-token)) url))))

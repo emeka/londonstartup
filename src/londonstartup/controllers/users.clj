@@ -2,7 +2,8 @@
   (:require [ring.util.response :as resp]
             [londonstartup.models.users :as users]
             [londonstartup.views.users :as views]
-            [londonstartup.common.result :as result])
+            [londonstartup.common.result :as result]
+            [londonstartup.services.session :as session])
   (import org.bson.types.ObjectId))
 
 (defn set-id [user]
@@ -15,7 +16,7 @@
     user))
 
 ;This is to avoid injecting addition user fields like :auth for example
-(def fields [:_id :username ])
+(def fields [:_id :username :githubAccount :linkdedInAccount :googlePlusAccount])
 (defn sanetize [user]
   (let [user (select-keys user fields)]
     (set-id user)))
@@ -31,12 +32,13 @@
       (resp/redirect "/users"))))
 
 ;;Modify
-(defn user-new [user]
+(defn user-new [user uri]
   (let [user (sanetize user)
+        user (merge user (session/user))
         add-result (users/add! user)]
     (if (not (result/has-error? add-result))
       (resp/redirect-after-post (str "/users/" (:username user)))
-      (views/add-user-page add-result))))
+      (views/signup-page add-result uri))))
 
 (defn user-update [user & [default-username]]
   (let [user (sanetize user)
@@ -50,8 +52,8 @@
   (resp/redirect "/users"))
 
 ;;Forms
-(defn add-user-form []
-  (views/add-user-page (result/result {})))
+(defn signup [uri]
+  (views/signup-page (result/result (session/user)) uri))
 
 (defn update-user-form [username]
   (let [lookup-result (users/username->user username)]

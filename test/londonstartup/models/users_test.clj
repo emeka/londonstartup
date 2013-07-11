@@ -55,7 +55,8 @@
     (is (result/has-error? (users/id-free? {:_id user1-id}))))
 
   (deftest users
-    (is (= (list user1 user2) (result/value (users/users)))))
+    (is (= (list user1 user2) (result/value (users/users))))
+    (is (= (list user1) (result/value (users/users {"_id" user1-id})))))
 
   (deftest add!
     (users/add! user3)

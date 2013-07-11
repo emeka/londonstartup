@@ -43,12 +43,13 @@
 
 (defn navbar-login [config]
   (let [config (:login config)
-        enabled (:enabled config)]
+        enabled (:enabled config true)]
     (if enabled
       (if (session/user-logged?)
         (form-to {:class "navbar-form pull-right"} [:get "/logout"]
           [:button.btn {:type "submit"} (str "Sign out " (session/username))])
         (form-to {:class "navbar-form pull-right"} [:get "/login"]
+          (hidden-field :auto "true")
           [:button.btn {:type "submit"} [:span [:img {:src "/img/bird_blue_16.png"}] " Sign in with Twitter"]])
         ))))
 
@@ -77,8 +78,6 @@
 ;      </div>
 ;    </div></div>
 
-
-
 (defn searchbar [& query]
   [:section.container-fluid [:div.row-fluid [:div.span8.offset2 (form-to {:class "form-inline"} [:get "/startups"]
                                                                   (text-field {:class "span8"} :query (first query))
@@ -90,6 +89,9 @@
   (include-js "http://code.jquery.com/jquery-1.10.1.min.js"
     "/bootstrap/js/bootstrap.min.js"
     "/js/application.js"))
+
+(defn debug []
+  (if env/debug? [:div.row.debug [:div {:class "span12.hide"} (str @noir.session/*noir-session*)]]))
 
 (defhtml layout [& content]
   (let [split-navbar-config (split-with :navbar content)
@@ -118,4 +120,4 @@
                :href "http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-57-precomposed.png"}]
        [:link {:rel "shortcut icon" :href "http://twitter.github.io/bootstrap/assets/ico/favicon.png"}]]
 
-      [:body (navbar navbar-config) (flashbar) (if env/debug? [:div.row.debug [:div {:class "span12.hide"} (str (session/session))]]) [:div#wrapper content] javascript])))
+      [:body (navbar navbar-config) (flashbar) (debug) [:div#wrapper content] javascript])))

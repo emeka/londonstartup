@@ -162,19 +162,27 @@
 
 ;;Form Pages
 
+(defn add-form [startup errors]
+  [:div.row-fluid [:div.span12 [:div.module [:h1 "Please tell us about your startup:"]
+                                       (startup-form "Add" :post "/startups" startup errors)]]])
+
+(defn update-form [startup errors]
+  [:div.row-fluid [:div.span12 [:div.module [:h1 "Update your startup profile:"]
+                                (startup-form "Update" :put (str "/startups/" website) startup errors)
+                                (startup-remove-form startup)]]])
+
 (defn add-startup-page [startup-result]
   (let [startup (result/value startup-result)
         errors (result/errors startup-result)]
     (common/layout
       {:navbar {:search {:enabled false}}}
       [:header.jumbotron.subhead [:div.container [:h1 "Add New Startup"]]]
-      [:div.container-fluid [:div.row-fluid [:div.span12 (startup-form "Add" :post "/startups" startup errors)]]]))) ;The url should be calculated from the route
+      [:div.container-fluid (add-form startup errors)]))) ;The url should be calculated from the route
 
 (defn update-startup-page [startup-result & [default-website]]
   (let [website (get-field startup-result :website default-website)
         startup (result/value startup-result)
         errors (result/errors startup-result)]
     (common/layout
-      [:header.container-fluid (startup-header startup)]
-      [:div.container-fluid [:div.row-fluid [:div.span12 (startup-form "Update" :put (str "/startups/" website) startup errors) ;The url should be calculated from the route
-                                             (startup-remove-form startup)]]])))
+      [:header.jumbotron.subhead [:div.container [:h1 (str (:name startup))]]]
+      [:div.container-fluid (update-form startup errors)])))
