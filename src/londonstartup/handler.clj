@@ -52,8 +52,8 @@
   (DELETE "/users/:username" [username :as {uri :uri}] (nr/restricted (user/user-delete username)))
 
   ;; User Settings
-  (GET "/settings" [] (nr/restricted (user/settings)))
-  (PUT "/settings" [:as {settings :params}] (user/settings-update settings))
+  (GET "/settings" [redirect_to :as {uri :uri}] (nr/restricted (user/user-settings uri (redirect-url redirect_to uri))))
+  (PUT "/settings" [redirect_to :as {uri :uri settings :params}] (user/user-settings-update settings uri (redirect-url redirect_to uri)))
 
   ;; Users Forms
   (GET "/signup" [redirect_to] (nr/restricted (user/signup (redirect-url redirect_to))))

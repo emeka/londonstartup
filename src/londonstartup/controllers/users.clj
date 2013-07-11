@@ -50,7 +50,8 @@
 
 ;;Settings
 (defn user-settings [current-url redirect-url & [username]]
-  (let [lookup-result (users/username->user username)]
+  (let [username (if (empty? username) (:username (session/get :user )) username)
+        lookup-result (users/username->user username)]
     (if (not (result/has-error? lookup-result))
       (views/settings-page lookup-result redirect-url)
       (resp/redirect "/users")))) ;TODO add a "Page not found" page
