@@ -3,10 +3,10 @@
 }
 
 @media (max-width: 979px) {
-  .navbar-fixed-top,
-  .navbar-fixed-bottom {
-    position: fixed;
-  }
+    .navbar-fixed-top,
+    .navbar-fixed-bottom {
+        position: fixed;
+    }
 }
 
 body {
@@ -27,4 +27,19 @@ header {
 
 .field-error {
     color: red;
+}
+
+.module {
+    position: relative;
+    margin: 15px 0;
+    padding: 20px 20px 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+
+div.module > h1 {
+    margin-bottom: 1em;
 }

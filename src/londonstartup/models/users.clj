@@ -52,8 +52,9 @@
     (result/result user)
     (result/error user :_id "User entry already exists")))
 
-(defn users []
-  (result/result (mc/find-maps collection)))
+(defn users
+  ([] (result/result (mc/find-maps collection)))
+  ([query] (result/result (mc/find-maps collection query))))
 
 (defn generate-id-if-needed [user]
   (if (has-id? user)
