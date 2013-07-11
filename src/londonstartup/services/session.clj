@@ -15,17 +15,11 @@
 (defn remove! [k]
   (ns/remove! k))
 
-(defn user-logged! [user]
-  (put! :user user))
+(defn clear! []
+  (ns/clear!))
 
-(defn user-logged? []
-  (get :user ))
+(defn flash! [message]
+  (ns/flash-put! :message message))
 
-(defn user-logout! []
-  (remove! :user ))
-
-(defn username []
-  (get-in (get :user ) [:auth :twitter :screen_name ]))
-
-(defn session []
-  @noir.session/*noir-session*)
+(defn flash []
+  (ns/flash-get :message))

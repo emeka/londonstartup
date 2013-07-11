@@ -3,7 +3,8 @@
             [londonstartup.views.common :as common]
             [londonstartup.views.bootstrap :as bs]
             [londonstartup.common.result :as result]
-            [londonstartup.common.validation :as validate])
+            [londonstartup.common.validation :as validate]
+            [londonstartup.environment :as env])
   (:use hiccup.core
         hiccup.element
         hiccup.page
@@ -36,8 +37,11 @@
 (defn get-link [{:keys [username]} & content]
   (link-to (str "/users/" username) content))
 
-(defn update-link [{:keys [username]} & content]
-  (link-to (str "/update/users/" username) content))
+(defn settings-url [{:keys [username]}]
+  (str "/users/" username "/settings"))
+
+(defn settings-link [user & content]
+  (link-to (settings-url user) content))
 
 (defn add-link [content]
   (link-to "/add/users" content))
@@ -46,38 +50,38 @@
 (defn error-text [errors]
   (reduce #(conj %1 %2 [:br ]) [:span.help-inline ] errors))
 
-(defn user-fields [{:keys [website username twitterAccount githubAccount linkdedInAccount phone _id]} errors]
+(defn user-fields [{:keys [username website githubAccount linkedInAccount googlePlusAccount _id]} errors redirect_to]
   (list
     (bs/row
-      (bs/span6 (bs/control-group :username "username" (text-field {:placeholder ""} :username username) (validate/on-error errors :username error-text))
-        (bs/control-group :website "Website" (text-field {:placeholder "Website"} :website website) (validate/on-error errors :website error-text))
-        (bs/control-group :twitterAccount "Twitter Account" (text-field {:placeholder "@Example"} :twitterAccount twitterAccount))
-        (bs/control-group :githubAccount "Github" (text-field {:placeholder "@Example"} :githubAccount githubAccount))
-        (bs/control-group :linkdedInAccount "LinkedIn" (text-field {:placeholder "Example"} :linkdedInAccount linkdedInAccount))
-        (bs/control-group :phone "Phone" (text-field {:placeholder "ex: +44 20 7123 1234"} :phone phone)))
-      (hidden-field :_id _id))))
+      (bs/span6
+        ;(bs/control-group :username "Username" (text-field {:class "uneditable-input" :placeholder ""} :username username) (validate/on-error errors :username error-text))
+        ;(bs/control-group :website "Website" (text-field {:class "uneditable-input"  :placeholder "www.example.com"} :website website) (validate/on-error errors :website error-text))
+        (bs/control-group :githubAccount "Github" (text-field {:placeholder "Account name"} :githubAccount githubAccount))
+        (bs/control-group :linkedInAccount "LinkedIn" (text-field {:placeholder "Account name"} :linkedInAccount linkedInAccount))
+        (bs/control-group :googlePlusAccount "Google +" (text-field {:placeholder "Account name"} :googlePlusAccount googlePlusAccount)))
+      (hidden-field :_id _id)
+      (hidden-field :redirect_to redirect_to))))
 
 (defn user-remove-form [{:keys [username]}]
   (when username
     (form-to [:delete (str "/users/" username)] ;The url should be calculated from the route
       (submit-button {:class "btn btn-danger"} "Delete"))))
 
-(defn user-form [action method url user errors]
-  (form-to {:class "form-horizontal"} [method url]
-    (user-fields user errors)
+(defn user-form [action method update-url redirect_to user errors]
+  (form-to {:class "form-horizontal"} [method update-url]
+    (user-fields user errors redirect_to)
     (bs/row
-      (bs/span4 [:a.btn {:href url} "Cancel"]
-        (submit-button {:class "btn btn-primary"} action)))))
+      (bs/span4 (submit-button {:class "btn btn-primary"} action)))))
 
 ;;Header
 (defn badge [icon value]
   [:small (bs/icon icon) " " value " "])
 
 (defn user-edit-button [user]
-  [:small (update-link user [:i.icon-edit ])])
+  [:small (settings-link user [:i.icon-edit ])])
 
 (defn user-username [{:keys [username] :as user}]
-  [:div.user-header.span6 [:h2 (get-link user username) [:small (update-link user [:i.icon-edit ])]]])
+  [:div.user-header.span6 [:h2 (get-link user username) [:small (settings-link user [:i.icon-edit ])]]])
 
 (defn user-badges [user]
   [:div.user-badges.span4.offset2 [:h2 (badge "icon-user" 13) (badge "icon-bullhorn" 2450) (badge "icon-heart" 200)]])
@@ -87,20 +91,30 @@
 
 
 ;;Details
+(defn field [name value]
+  (when (not (empty? value))
+    [:span [:strong name] [:br ] [:span value] [:br ] [:br ]]))
+
 (defn phone [{:keys [phone]}]
-  [:span [:strong "Phone"] [:br ] [:span phone] [:br ] [:br ]])
+  (field "Phone" phone))
 
 (defn website [{:keys [website]}]
-  [:span [:strong "Website"] [:br ]
-   (let [domain-name (string/replace website "http://" "")]
-     (link-to (str "http://" domain-name) domain-name)) [:br ] [:br ]])
+  (when (not (empty? website))
+    (let [domain-name (string/replace website "http://" "")
+          link (link-to (str "http://" domain-name) domain-name)]
+      (field "Website" link))))
 
 (defn twitterAccount [{:keys [twitterAccount]}]
-  [:span [:strong "Twitter"] [:br ] [:span twitterAccount] [:br ] [:br ]])
+  (field "Twitter" twitterAccount))
+
 (defn githubAccount [{:keys [githubAccount]}]
-  [:span [:strong "Github"] [:br ] [:span githubAccount] [:br ] [:br ]])
+  (field "Github" githubAccount))
+
 (defn linkedInAccount [{:keys [linkedInAccount]}]
-  [:span [:strong "LinkedIn"] [:br ] [:span linkedInAccount] [:br ] [:br ]])
+  (field "LinkedIn" linkedInAccount))
+
+(defn googlePlusAccount [{:keys [googlePlusAccount]}]
+  (field "Google Plus" googlePlusAccount))
 
 ;;Details
 
@@ -114,7 +128,7 @@
   (when user
     [:section.user.container-fluid {:id (id user)}
      (user-header user)
-     [:div.row [:div.span3 (website user) (twitterAccount user) (githubAccount user) (linkedInAccount user) (phone user)]
+     [:div.row [:div.span3 (website user) (twitterAccount user) (githubAccount user) (linkedInAccount user) (googlePlusAccount user) (phone user)]
       ]]
     ))
 
@@ -132,21 +146,28 @@
     {:navbar {:search {:query query}}}
     (user-list (result/value users-result))))
 
-;;Form Pages
+;;Settings
 
-(defn add-user-page [user-result]
+(defn settings-form [user message button-text redirect_to errors]
+  [:div.row-fluid [:div.span6.offset3 [:div.module [:h1 message]
+                                       (user-form button-text :put (settings-url user) redirect_to user errors)]]])
+(defn debug [value]
+  (if env/debug? [:div.row.debug [:div {:class "span12.hide"} (str value)]]))
+
+(defn- settings-page-template [user-result redirect_to header message button-text]
   (let [user (result/value user-result)
         errors (result/errors user-result)]
     (common/layout
-      {:navbar {:search {:enabled false}}}
-      [:header.jumbotron.subhead [:div.container [:h1 "Add New user"]]]
-      [:div.container-fluid [:div.row-fluid [:div.span12 (user-form "Add" :post "/users" user errors)]]]))) ;The url should be calculated from the route
+      {:navbar {:search {:enabled false} :login {:enabled true}}}
+      [:header.jumbotron.subhead [:div.container [:h1 header]]]
+      (debug user)
+      (debug errors)
+      [:div.container-fluid (settings-form user message button-text redirect_to errors)])))
 
-(defn update-user-page [user-result & [default-website]]
-  (let [website (get-field user-result :website default-website)
-        user (result/value user-result)
-        errors (result/errors user-result)]
-    (common/layout
-      [:header.container-fluid (user-header user)]
-      [:div.container-fluid [:div.row-fluid [:div.span12 (user-form "Update" :put (str "/users/" website) user errors) ;The url should be calculated from the route
-                                             (user-remove-form user)]]])))
+(defn signup-page [user-result redirect_to]
+  (let [username (:username (result/value user-result))]
+    (settings-page-template user-result redirect_to (str "Welcome " username) "Please tell us more about you:" "Continue")))
+
+(defn settings-page [user-result redirect_to & [default-username]]
+  (let [username (:username (result/value user-result) default-username)]
+    (settings-page-template user-result redirect_to (str username) "Update your profile:" "Update")))

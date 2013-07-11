@@ -4,9 +4,10 @@
   (:use [hiccup.page :only [include-css include-js html5]]
         [hiccup.def :only [defhtml]]
         [hiccup.element :only [link-to]]
-        [hiccup.form]))
+        [hiccup.form]
+        [noir.request]))
 
-(def menu-definition (array-map "Home" "/" "Jobs" "#fakelink" "About" "#fakelink" "More" (array-map "Add New Startup" "/add/startups" "My Settings" "#fakelink")))
+(def menu-definition (array-map "Home" "/" "Jobs" "#fakelink" "About" "#fakelink" "More" (array-map "Add New Startup" "/add/startups" "My Settings" "/settings")))
 
 (declare menu)
 
@@ -34,19 +35,24 @@
   [:a.brand.pull-left {:href "#"} name])
 
 (defn navbar-search [config]
-  (let [enabled (:enabled config true)
+  (let [config (:search config)
+        enabled (:enabled config true)
         query (:query config)]
     (if enabled
       (form-to {:class "navbar-search"} [:get "/startups"]
         (text-field {:placeholder "Search" :class "span4"} :query query)))))
 
-(defn navbar-login []
-  (if (session/user-logged?)
-    (form-to {:class "navbar-form pull-right"} [:get "/logout"]
-      [:button.btn {:type "submit"} (str "Sign out " (session/username))])
-    (form-to {:class "navbar-form pull-right"} [:get "/login"]
-      [:button.btn {:type "submit"} [:span [:img {:src "/img/bird_blue_16.png"}] " Sign in with Twitter"]])
-    ))
+(defn navbar-login [config]
+  (let [config (:login config)
+        enabled (:enabled config true)]
+    (if enabled
+      (if-let [user (session/get :user)]
+        (form-to {:class "navbar-form pull-right"} [:get "/logout"]
+          [:button.btn {:type "submit"} (str "Sign out " (:username user))])
+        (form-to {:class "navbar-form pull-right"} [:get "/login"]
+          (hidden-field :auto "true")
+          [:button.btn {:type "submit"} [:span [:img {:src "/img/bird_blue_16.png"}] " Sign in with Twitter"]])
+        ))))
 
 ;defn navbar-login [& username]
 ;  (if (session/user-logged?)
@@ -55,13 +61,23 @@
 
 
 (defn navbar [config]
-  (let [search-config (:search config)]
-    [:div.navbar.navbar-inverse.navbar-fixed-top [:div.navbar-inner [:div.container-fluid (brand "SD/London")
-                                                                     (nav-collapse-button "#nav-collapse")
-                                                                     [:div#nav-collapse.nav-collapse.collapse (menu menu-definition "nav")
-                                                                      (navbar-search search-config)
-                                                                      (navbar-login)
-                                                                      ]]]]))
+  [:div.navbar.navbar-inverse.navbar-fixed-top [:div.navbar-inner [:div.container-fluid (brand "SD/London")
+                                                                   (nav-collapse-button "#nav-collapse")
+                                                                   [:div#nav-collapse.nav-collapse.collapse (menu menu-definition "nav")
+                                                                    (navbar-search config)
+                                                                    (navbar-login config)
+                                                                    ]]]])
+
+(defn flashbar []
+  (if-let [message (session/flash)]
+    [:div.row.flash [:div.span12 [:h1 message]]]))
+
+;<div class="alert-messages  hidden" id="message-drawer">
+;        <div class="message ">
+;      <div class="message-inside">
+;        <span class="message-text">Wrong Username/Email and password combination.</span><a class="dismiss" href="#">×</a>
+;      </div>
+;    </div></div>
 
 (defn searchbar [& query]
   [:section.container-fluid [:div.row-fluid [:div.span8.offset2 (form-to {:class "form-inline"} [:get "/startups"]
@@ -74,6 +90,9 @@
   (include-js "http://code.jquery.com/jquery-1.10.1.min.js"
     "/bootstrap/js/bootstrap.min.js"
     "/js/application.js"))
+
+(defn debug []
+  (if env/debug? [:div.row.debug [:div {:class "span12"} (str @noir.session/*noir-session* "</br></br>" noir.request/*request*)]]))
 
 (defhtml layout [& content]
   (let [split-navbar-config (split-with :navbar content)
@@ -102,4 +121,4 @@
                :href "http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-57-precomposed.png"}]
        [:link {:rel "shortcut icon" :href "http://twitter.github.io/bootstrap/assets/ico/favicon.png"}]]
 
-      [:body (navbar navbar-config) (if env/debug? [:div.row.debug [:div {:class "span12.hide"} (str (session/session))]]) [:div#wrapper content] javascript])))
+      [:body (navbar navbar-config) (flashbar) (debug) [:div#wrapper content] javascript])))
