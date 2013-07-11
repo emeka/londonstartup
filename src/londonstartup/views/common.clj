@@ -4,9 +4,10 @@
   (:use [hiccup.page :only [include-css include-js html5]]
         [hiccup.def :only [defhtml]]
         [hiccup.element :only [link-to]]
-        [hiccup.form]))
+        [hiccup.form]
+        [noir.request]))
 
-(def menu-definition (array-map "Home" "/" "Jobs" "#fakelink" "About" "#fakelink" "More" (array-map "Add New Startup" "/add/startups" "My Settings" "#fakelink")))
+(def menu-definition (array-map "Home" "/" "Jobs" "#fakelink" "About" "#fakelink" "More" (array-map "Add New Startup" "/add/startups" "My Settings" "/settings")))
 
 (declare menu)
 
@@ -91,7 +92,7 @@
     "/js/application.js"))
 
 (defn debug []
-  (if env/debug? [:div.row.debug [:div {:class "span12.hide"} (str @noir.session/*noir-session*)]]))
+  (if env/debug? [:div.row.debug [:div {:class "span12"} (str @noir.session/*noir-session* "</br></br>" noir.request/*request*)]]))
 
 (defhtml layout [& content]
   (let [split-navbar-config (split-with :navbar content)

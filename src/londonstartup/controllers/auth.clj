@@ -8,8 +8,8 @@
 
 
 
-(defn callback [uri]
-  (str (get (System/getenv) "BASE_URL" (get (System/getenv) "URL")) "/login?auto=true&uri=" uri))
+(defn callback [redirect_to]
+  (str (get (System/getenv) "BASE_URL" (get (System/getenv) "URL")) "/login?auto=true&redirect_to=" redirect_to))
 
 (defn twitter-auth->user [{:keys [screen_name] :as auth}]
   {:username screen_name :auth {:twitter auth}})
@@ -34,13 +34,13 @@
     (if (not (result/has-error? twitter-auth))
       (result/value twitter-auth))))
 
-(defn login [uri oauth_token oauth_verifier denied auto]
-  (let [uri (if uri uri "/")]
+(defn login [redirect_to oauth_token oauth_verifier denied auto]
+  (let [redirect_to (if redirect_to redirect_to "/")]
     (cond
-      (session/get :user) (resp/redirect uri)
-      (not (nil? denied)) (do (session/remove! :request-token ) (session/flash! "ACCESS DENIED") (views/login-page))
+      (session/get :user) (resp/redirect redirect_to)
+      (not (nil? denied)) (do (session/clear!) (session/flash! "ACCESS DENIED") (views/login-page))
       (nil? auto) (views/login-page)
-      (or (not oauth_token) (not oauth_verifier)) (if-let [request-token (get-request-token uri)]
+      (or (not oauth_token) (not oauth_verifier)) (if-let [request-token (get-request-token redirect_to)]
                                                     (if (= "true" (:oauth_callback_confirmed request-token))
                                                       (do
                                                         (session/put! :request-token request-token)
@@ -57,17 +57,17 @@
                         (if (not (result/has-error? (update-user! db-user session-user)))
                           (do
                             (session/put! :user db-user)
-                            (resp/redirect uri))
+                            (resp/redirect redirect_to))
                           (str "ERROR: Cannot update use")))
                       (let [user-result (users/add! session-user)]
                         (if (not (result/has-error? user-result))
                           (do
                             (session/put! :user (result/value user-result))
-                            (resp/redirect (str "/signup?uri=" uri)))
+                            (resp/redirect (str "/signup?redirect_to=" redirect_to)))
                           (str "ERROR: cannot add user")))))
                   (str "ERROR: cannot get twitter-auth"))
                 (str "ERROR: oauth_tokens are different"))))))
 
 (defn logout []
-  (session/remove! :user)
+  (session/clear!)
   (resp/redirect "/"))

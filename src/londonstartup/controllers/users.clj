@@ -33,13 +33,13 @@
       (resp/redirect "/users"))))
 
 ;;Modify
-(defn user-new [user uri]
+(defn user-new [user redirect-url]
   (let [user (sanetize user)
         user (merge user (session/get :user ))
         add-result (users/add! user)]
     (if (not (result/has-error? add-result))
       (resp/redirect-after-post (str "/users/" (:username user)))
-      (views/signup-page add-result uri))))
+      (views/signup-page add-result redirect-url))))
 
 (defn user-delete [username]
   (users/remove-username! username)
@@ -49,26 +49,27 @@
   )
 
 ;;Settings
-(defn user-settings [username uri]
+(defn user-settings [current-url redirect-url & [username]]
   (let [lookup-result (users/username->user username)]
     (if (not (result/has-error? lookup-result))
-      (views/settings-page lookup-result uri)
-      (resp/redirect "/users"))))
+      (views/settings-page lookup-result redirect-url)
+      (resp/redirect "/users")))) ;TODO add a "Page not found" page
 
-(defn user-settings-update [settings uri & [default-username]]
+(defn user-settings-update [settings current-url redirect-url & [default-username]]
   (let [settings (sanetize settings)
         user (merge (session/get :user ) settings)
         update-result (users/update! user)]
     (if (not (result/has-error? update-result))
       (do
         (session/put! :user (result/value update-result))
-        (resp/redirect-after-post (str "/users/" (:username user))))
-      (views/settings-page update-result uri default-username))))
+        ;TODO flash confirmation
+        (resp/redirect-after-post (str redirect-url)))
+      (views/settings-page update-result redirect-url default-username))))
 
 (defn settings []
   (let [username (:username (session/get :user ))]
     )
   )
 
-(defn signup [uri]
-  (views/signup-page (result/result (session/get :user )) uri))
+(defn signup [redirect-url]
+  (views/signup-page (result/result (session/get :user )) redirect-url))

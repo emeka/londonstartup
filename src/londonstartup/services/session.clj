@@ -15,6 +15,9 @@
 (defn remove! [k]
   (ns/remove! k))
 
+(defn clear! []
+  (ns/clear!))
+
 (defn flash! [message]
   (ns/flash-put! :message message))
 

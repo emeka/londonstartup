@@ -109,7 +109,7 @@
   )
 
 (defn phone [{:keys [phone]}]
-    [:span [:strong "Phone"] [:br ] [:span phone] [:br ] [:br ]])
+  [:span [:strong "Phone"] [:br ] [:span phone] [:br ] [:br ]])
 
 (defn website [{:keys [website]}]
   [:span [:strong "Website"] [:br ]
@@ -164,7 +164,7 @@
 
 (defn add-form [startup errors]
   [:div.row-fluid [:div.span12 [:div.module [:h1 "Please tell us about your startup:"]
-                                       (startup-form "Add" :post "/startups" startup errors)]]])
+                                (startup-form "Add" :post "/startups" startup errors)]]])
 
 (defn update-form [startup errors]
   [:div.row-fluid [:div.span12 [:div.module [:h1 "Update your startup profile:"]

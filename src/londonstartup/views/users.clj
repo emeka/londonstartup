@@ -50,7 +50,7 @@
 (defn error-text [errors]
   (reduce #(conj %1 %2 [:br ]) [:span.help-inline ] errors))
 
-(defn user-fields [{:keys [username website githubAccount linkedInAccount googlePlusAccount _id]} errors]
+(defn user-fields [{:keys [username website githubAccount linkedInAccount googlePlusAccount _id]} errors redirect_to]
   (list
     (bs/row
       (bs/span6
@@ -59,19 +59,19 @@
         (bs/control-group :githubAccount "Github" (text-field {:placeholder "Account name"} :githubAccount githubAccount))
         (bs/control-group :linkedInAccount "LinkedIn" (text-field {:placeholder "Account name"} :linkedInAccount linkedInAccount))
         (bs/control-group :googlePlusAccount "Google +" (text-field {:placeholder "Account name"} :googlePlusAccount googlePlusAccount)))
-      (hidden-field :_id _id))))
+      (hidden-field :_id _id)
+      (hidden-field :redirect_to redirect_to))))
 
 (defn user-remove-form [{:keys [username]}]
   (when username
     (form-to [:delete (str "/users/" username)] ;The url should be calculated from the route
       (submit-button {:class "btn btn-danger"} "Delete"))))
 
-(defn user-form [action method url user errors]
-  (form-to {:class "form-horizontal"} [method url]
-    (user-fields user errors)
+(defn user-form [action method update-url redirect_to user errors]
+  (form-to {:class "form-horizontal"} [method update-url]
+    (user-fields user errors redirect_to)
     (bs/row
-      (bs/span4 [:a.btn {:href url} "Cancel"]
-        (submit-button {:class "btn btn-primary"} action)))))
+      (bs/span4 (submit-button {:class "btn btn-primary"} action)))))
 
 ;;Header
 (defn badge [icon value]
@@ -148,26 +148,26 @@
 
 ;;Settings
 
-(defn settings-form [user message button-text errors]
+(defn settings-form [user message button-text redirect_to errors]
   [:div.row-fluid [:div.span6.offset3 [:div.module [:h1 message]
-                                       (user-form button-text :put (settings-url user) user errors)]]])
+                                       (user-form button-text :put (settings-url user) redirect_to user errors)]]])
 (defn debug [value]
   (if env/debug? [:div.row.debug [:div {:class "span12.hide"} (str value)]]))
 
-(defn- settings-page-template [user-result uri header message button-text]
+(defn- settings-page-template [user-result redirect_to header message button-text]
   (let [user (result/value user-result)
         errors (result/errors user-result)]
     (common/layout
-      {:navbar {:search {:enabled false} :login {:enabled false}}}
+      {:navbar {:search {:enabled false} :login {:enabled true}}}
       [:header.jumbotron.subhead [:div.container [:h1 header]]]
       (debug user)
       (debug errors)
-      [:div.container-fluid (settings-form user message button-text errors)])))
+      [:div.container-fluid (settings-form user message button-text redirect_to errors)])))
 
-(defn signup-page [user-result uri]
+(defn signup-page [user-result redirect_to]
   (let [username (:username (result/value user-result))]
-    (settings-page-template user-result uri (str "Welcome " username) "Please tell us more about you:" "Create Account")))
+    (settings-page-template user-result redirect_to (str "Welcome " username) "Please tell us more about you:" "Continue")))
 
-(defn settings-page [user-result uri & [default-username]]
+(defn settings-page [user-result redirect_to & [default-username]]
   (let [username (:username (result/value user-result) default-username)]
-    (settings-page-template user-result uri (str username) "Update your profile:" "Update")))
+    (settings-page-template user-result redirect_to (str username) "Update your profile:" "Update")))

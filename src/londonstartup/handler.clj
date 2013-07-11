@@ -15,6 +15,10 @@
   (import org.bson.types.ObjectId))
 
 
+(defn redirect-url
+  ([redirect_to] (redirect-url redirect_to "/"))
+  ([redirect_to default] (if (not (empty? redirect_to)) redirect_to default)))
+
 ; /startups
 ; /funds
 
@@ -41,19 +45,22 @@
   ;; User Admin
   (GET "/users" [query] (nr/restricted (user/users query)))
   (GET "/users/:username" [username] (nr/restricted (user/user username))) ; == profile
-  (GET "/users/:username/settings" [username uri] (nr/restricted (user/user-settings username uri)))
-  (PUT "/users/:_username/settings" [_username uri :as {settings :params}] (nr/restricted (user/user-settings-update settings uri _username)))
-  (DELETE "/users/:username" [username] (nr/restricted (user/user-delete username)))
+  (GET "/users/:username/settings" [username redirect_to :as {uri :uri}]
+    (nr/restricted (user/user-settings uri (redirect-url redirect_to uri) username)))
+  (PUT "/users/:_username/settings" [_username redirect_to :as {uri :uri settings :params}]
+    (nr/restricted (user/user-settings-update settings uri (redirect-url redirect_to uri) _username)))
+  (DELETE "/users/:username" [username :as {uri :uri}] (nr/restricted (user/user-delete username)))
 
   ;; User Settings
   (GET "/settings" [] (nr/restricted (user/settings)))
   (PUT "/settings" [:as {settings :params}] (user/settings-update settings))
 
   ;; Users Forms
-  (GET "/signup" [uri] (nr/restricted (user/signup uri)))
+  (GET "/signup" [redirect_to] (nr/restricted (user/signup (redirect-url redirect_to))))
 
   ;;Log In
-  (GET "/login" [uri oauth_token oauth_verifier denied auto] (auth/login uri oauth_token oauth_verifier denied auto))
+  (GET "/login" [redirect_to oauth_token oauth_verifier denied auto]
+    (auth/login (redirect-url redirect_to) oauth_token oauth_verifier denied auto))
 
   ;;Log Out
   (GET "/logout" [] (auth/logout))
@@ -62,10 +69,10 @@
   (route/resources "/"))
 
 (defn redirect-to-login [{:keys [uri]}]
-  (resp/redirect (str "/login?auto=true&uri=" uri)))
+  (resp/redirect (str "/login?auto=true&redirect_to=" uri)))
 
 (defn user-logged? [req]
-  (session/get :user))
+  (session/get :user ))
 
 (def app
   ;;The first parameter of app-handler must be a sequence
