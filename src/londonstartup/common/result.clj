@@ -39,6 +39,9 @@
 (defn has-error? [value]
   (contains? (result value) :errors ))
 
+(defn error-free? [value]
+  (not (has-error? value)))
+
 (defn errors [value]
   (:errors value))
 
