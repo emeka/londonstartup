@@ -82,7 +82,7 @@
 
 (defn- ^{:testable true} validate-oauth-token [request-token oauth-token]
   (if (= oauth-token (:oauth_token request-token))
-    (result/value request-token)
+    (result/result request-token)
     (result/error {:oauth-token oauth-token :request-token request-token} :oauth_token "oauth_token values do not match")))
 
 (defn- ^{:testable true} create-session-user [oauth_token oauth_verifier]
@@ -106,11 +106,11 @@
   (let [redirect_to (if (empty? redirect_to) "/" redirect_to)]
     (cond
       (session/get :user ) (resp/redirect redirect_to)
-      (not (nil? denied)) (do
+      (not (empty? denied)) (do
                             (session/clear!)
                             (session/flash! "ACCESS DENIED")
                             (views/login-page))
-      (nil? auto) (views/login-page)
+      (or (empty? auto) (= "false" (clojure.string/lower-case auto))) (views/login-page)
       (or (not oauth_token) (not oauth_verifier)) (redirect-to-twitter-auth-page redirect_to)
       :else (authorise-user oauth_token oauth_verifier redirect_to))))
 
