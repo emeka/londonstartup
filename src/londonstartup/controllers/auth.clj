@@ -109,22 +109,10 @@
       (not (empty? denied)) (do
                               (session/clear!)
                               (session/flash! "ACCESS DENIED")
-                              (views/login-page))
-      (or (empty? auto) (= "false" (clojure.string/lower-case auto))) (views/login-page)
+                              (views/login-page redirect_to))
+      (or (empty? auto) (= "false" (clojure.string/lower-case auto))) (views/login-page redirect_to)
       (or (not oauth_token) (not oauth_verifier)) (redirect-to-twitter-auth-page redirect_to)
       :else (authorise-user oauth_token oauth_verifier redirect_to))))
-
-
-;(defn login [redirect_to oauth_token oauth_verifier denied auto]
-;  (let [redirect_to (if (empty? redirect_to) "/" redirect_to)]
-;    (cond
-;      (session/get :user ) (str "User logged" "<br>" oauth_token "<br>"oauth_verifier "<br>"denied "<br>"auto "<br>"redirect_to )
-;      (not (empty? denied)) (str "Access Denied" "<br>" oauth_token "<br>"oauth_verifier "<br>"denied "<br>"auto "<br>"redirect_to )
-;      (or (empty? auto) (= "false" (clojure.string/lower-case auto))) (str "Manual login" "<br>" oauth_token "<br>"oauth_verifier "<br>"denied "<br>"auto "<br>"redirect_to )
-;      (or (not oauth_token) (not oauth_verifier)) (str "Auto login" "<br>" oauth_token "<br>"oauth_verifier "<br>"denied "<br>"auto "<br>"redirect_to )
-;      :else (str "Twitter Auth" "<br>" oauth_token "<br>"oauth_verifier "<br>"denied "<br>"auto "<br>"redirect_to )
-;        )))
-
 
 (defn logout []
   (session/clear!)
