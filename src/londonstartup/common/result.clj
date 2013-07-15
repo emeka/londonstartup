@@ -20,7 +20,7 @@
 ;; Result
 
 (defn result? [result]
-  (and (map? result) (or (contains? result :value ) (contains? result :errors ))))
+  (and (map? result) (contains? result :value )))
 
 (defn result [value]
   (if (result? value)
@@ -37,10 +37,10 @@
   (add-error value key msg))
 
 (defn has-error? [value]
-  (contains? (result value) :errors ))
+  (and (result? value ) (contains? (result value) :errors )))
 
 (defn error-free? [value]
-  (not (has-error? value)))
+  (and (result? value ) (not (has-error? value))))
 
 (defn errors [value]
   (:errors value))
