@@ -30,17 +30,27 @@
 (defn total []
   (result/result (mc/count collection)))
 
-(defn id->user [id]
-  (let [lookup (mc/find-one-as-map collection {:_id id})]
+(defn user [query]
+  (let [lookup (mc/find-one-as-map collection query)]
     (if lookup
       (result/result lookup)
-      (result/error lookup :website "Unknown User ID"))))
+      (result/error query :query "User not found"))))
+
+(defn users
+  ([] (result/result (mc/find-maps collection)))
+  ([query] (result/result (mc/find-maps collection query))))
+
+(defn id->user [id]
+  (let [user-result (user {:_id id})]
+    (if (not (result/has-error? user-result))
+      user-result
+      (result/add-error user-result :website (str "Unknown User ID: " id)))))
 
 (defn username->user [username]
-  (let [lookup (mc/find-one-as-map collection {:username username})]
-    (if lookup
-      (result/result lookup)
-      (result/error lookup :username "Unknown username"))))
+  (let [user-result (user {:username username})]
+    (if (not (result/has-error? user-result))
+      user-result
+      (result/add-error user-result :website (str "Unknown username: " username)))))
 
 (defn username-free? [{:keys [username] :as user}]
   (if (= 0 (mc/count collection {:username username}))
@@ -51,10 +61,6 @@
   (if (or (not _id) (result/has-error? (id->user _id)))
     (result/result user)
     (result/error user :_id "User entry already exists")))
-
-(defn users
-  ([] (result/result (mc/find-maps collection)))
-  ([query] (result/result (mc/find-maps collection query))))
 
 (defn generate-id-if-needed [user]
   (if (has-id? user)

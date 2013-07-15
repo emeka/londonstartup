@@ -1,3 +1,9 @@
-(ns londonstartup.environment)
+(ns londonstartup.environment
+  (:refer-clojure :exclude [get]))
 
-(def debug? (= "true" (get (System/getenv) "DEBUG" )))
+
+(defn get
+  ([key] (get key nil))
+  ([key default] (clojure.core/get (System/getenv) key default)))
+
+(def debug? (= "true" (get "DEBUG")))
