@@ -11,14 +11,15 @@
         hiccup.def))
 
 
-(defn login-form []
+(defn login-form [redirect-to]
   [:div.login [:h1 "Startup Directory uses Twitter for Authentication"]
-   [:a.btn {:href "/login?auto=true"} [:span [:img {:src "/img/bird_blue_16.png"}] " Sign in with Twitter"]]])
+   [:a.btn {:href (str "/login?auto=true&redirect_to=" redirect-to)} [:span [:img {:src "/img/bird_blue_16.png"}] " Sign in with Twitter"]]])
 
-(defn login-page []
-  (common/layout
-    {:navbar {:search {:enabled false} :login {:enabled false}}}
-    [:div.container-fluid [:div.row-fluid [:div.span6.offset3 (login-form)]]]))
+(defn login-page
+  ([] (login-page "/"))
+  ([redirect-to] (common/layout
+                   {:navbar {:search {:enabled false} :login {:enabled false}}}
+                   [:div.container-fluid [:div.row-fluid [:div.span6.offset3 (login-form redirect-to)]]])))
 
 
 

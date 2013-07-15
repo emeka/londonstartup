@@ -178,19 +178,19 @@
       (session/get :user ) => nil
       (session/clear!) => anything
       (session/flash! "ACCESS DENIED") => anything
-      (views/login-page) => ..login-page..))
-  (fact "If the login is not automatic, we display the login page"
+      (views/login-page "/redirect-url") => ..login-page..))
+  (fact "If auto is nil, we display the login page"
     (auth/login "/redirect-url" ..oauth-token.. ..oauth-verifier.. nil nil) => ..login-page..
     (provided
       (session/get :user ) => nil
       (session/clear!) => anything :times 0
-      (views/login-page) => ..login-page..))
-  (fact "If the login is not automatic, we display the login page"
+      (views/login-page "/redirect-url") => ..login-page..))
+  (fact "If auto is false, we display the login page"
     (auth/login "/redirect-url" ..oauth-token.. ..oauth-verifier.. nil "False") => ..login-page..
     (provided
       (session/get :user ) => nil
       (session/clear!) => anything :times 0
-      (views/login-page) => ..login-page..))
+      (views/login-page "/redirect-url") => ..login-page..))
   (fact "If the login is automatic but we don't have the Twitter authorisation tokens, we redirect to Twitter"
     (auth/login "/redirect-url" ..oauth-token.. nil nil "True") => ..redirect-to-twitter..
     (provided
