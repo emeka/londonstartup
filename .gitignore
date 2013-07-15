@@ -8,3 +8,4 @@ pom.xml
 target/
 *.iml
 .env
+embongo.log
