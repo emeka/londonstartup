@@ -53,12 +53,12 @@
 
 (facts "We should update the user in the database if the twitter authorisation changed"
   (fact "We should do nothing if the Twitter authorisations are the same"
-    (update-user! {:auth {:twitter "Foo"}} {:auth {:twitter "Foo"}}) => anything
+    (update-user! {:auth {:twitter "Foo"}} {:auth {:twitter "Foo"}}) => valid-result?
     (provided (users/update! anything) => anything :times 0))
   (fact "We should update if the Twitter authorisations are different"
     (update-user! {:auth {:twitter {:user_id "1" :foo "Foo"}}}
-      {:auth {:twitter {:user_id "1" :foo "Bar"}}}) => ...Result...
-    (provided (users/update! anything) => ...Result... :times 1))
+      {:auth {:twitter {:user_id "1" :foo "Bar"}}}) => valid-result?
+    (provided (users/update! anything) => (value ...Result...) :times 1))
   (fact "We should return an error if the user_id values are different"
     (update-user! {:auth {:twitter {:user_id "1"}}} {:auth {:twitter {:user_id "2"}}}) => error-result?
     (provided (users/update! anything) => anything :times 0)))

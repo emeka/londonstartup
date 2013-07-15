@@ -29,7 +29,7 @@
     (if (= (:user_id session-twitter-auth) (:user_id db-twitter-auth))
       (if (not= session-twitter-auth db-twitter-auth)
         (users/update! (merge db-user session-user))
-        (result/value db-user))
+        (result/result db-user))
       (result/error {:db-user db-user :session-user session-user} :user_id "Twitter user_id values do not match"))))
 
 (defn- ^{:testable true} get-request-token [uri]
@@ -107,12 +107,24 @@
     (cond
       (session/get :user ) (resp/redirect redirect_to)
       (not (empty? denied)) (do
-                            (session/clear!)
-                            (session/flash! "ACCESS DENIED")
-                            (views/login-page))
+                              (session/clear!)
+                              (session/flash! "ACCESS DENIED")
+                              (views/login-page))
       (or (empty? auto) (= "false" (clojure.string/lower-case auto))) (views/login-page)
       (or (not oauth_token) (not oauth_verifier)) (redirect-to-twitter-auth-page redirect_to)
       :else (authorise-user oauth_token oauth_verifier redirect_to))))
+
+
+;(defn login [redirect_to oauth_token oauth_verifier denied auto]
+;  (let [redirect_to (if (empty? redirect_to) "/" redirect_to)]
+;    (cond
+;      (session/get :user ) (str "User logged" "<br>" oauth_token "<br>"oauth_verifier "<br>"denied "<br>"auto "<br>"redirect_to )
+;      (not (empty? denied)) (str "Access Denied" "<br>" oauth_token "<br>"oauth_verifier "<br>"denied "<br>"auto "<br>"redirect_to )
+;      (or (empty? auto) (= "false" (clojure.string/lower-case auto))) (str "Manual login" "<br>" oauth_token "<br>"oauth_verifier "<br>"denied "<br>"auto "<br>"redirect_to )
+;      (or (not oauth_token) (not oauth_verifier)) (str "Auto login" "<br>" oauth_token "<br>"oauth_verifier "<br>"denied "<br>"auto "<br>"redirect_to )
+;      :else (str "Twitter Auth" "<br>" oauth_token "<br>"oauth_verifier "<br>"denied "<br>"auto "<br>"redirect_to )
+;        )))
+
 
 (defn logout []
   (session/clear!)
