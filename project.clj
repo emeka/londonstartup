@@ -15,5 +15,6 @@
          :handler londonstartup.handler/app}
   :hooks [environ.leiningen.hooks]
   :profiles {:production {:env {:production true}}
-             :dev {:dependencies [[ring-mock "0.1.5"]
+             :dev {:dependencies [[midje "1.5.1"]
+                                  [ring-mock "0.1.5"]
                                   [org.slf4j/slf4j-nop "1.6.4"]]}})

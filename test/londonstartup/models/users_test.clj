@@ -41,6 +41,14 @@
   (deftest total
     (is (= 2 (result/value (users/total)))))
 
+  (deftest user
+    (is (= user1 (result/value (users/user {:_id user1-id}))))
+    (is (result/has-error? (users/user {:_id "foo"}))))
+
+  (deftest users
+    (is (= (list user1 user2) (result/value (users/users))))
+    (is (= (list user1) (result/value (users/users {"_id" user1-id})))))
+
   (deftest id->user
     (is (= user1 (result/value (users/id->user user1-id))))
     (is (result/has-error? (users/id->user "1234"))))
@@ -53,10 +61,6 @@
     (is (not (result/has-error? (users/id-free? {}))))
     (is (not (result/has-error? (users/id-free? {:_id (ObjectId.)}))))
     (is (result/has-error? (users/id-free? {:_id user1-id}))))
-
-  (deftest users
-    (is (= (list user1 user2) (result/value (users/users))))
-    (is (= (list user1) (result/value (users/users {"_id" user1-id})))))
 
   (deftest add!
     (users/add! user3)
@@ -77,10 +81,10 @@
   (deftest remove!
     (users/remove! user1-id)
     (is (= 1 (result/value (users/total))))
-    (is (= nil (result/value (users/id->user user1-id)))))
+    (is (result/has-error? (users/id->user user1-id))))
 
   (deftest remove-username!
     (users/remove-username! "User1")
     (is (= 1 (result/value (users/total))))
-    (is (= nil (result/value (users/id->user user1-id))))))
+    (is (result/has-error? (users/id->user user1-id)))))
 

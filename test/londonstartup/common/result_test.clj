@@ -22,6 +22,10 @@
   (is (not (result/has-error? (result/result nil))))
   (is (result/has-error? (result/add-error (result/result nil) :website "Error"))))
 
+(deftest error-free?
+  (is (result/error-free? (result/result nil)))
+  (is (not (result/error-free? (result/add-error (result/result nil) :website "Error")))))
+
 (deftest errors
   (is (nil? (result/errors (result/result nil))))
   (is (= {:website ["Error"]} (result/errors (result/add-error (result/result nil) :website "Error")))))
