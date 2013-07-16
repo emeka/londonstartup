@@ -17,7 +17,8 @@
   (is (not (nil? t/authentication-consumer))))
 
 (deftest request-token
-  (is (not (result/has-error? (t/request-token "http://staging.startupdirectory.org/login")))))
+  (is (not (result/has-error? (t/request-token "http://staging.startupdirectory.org/login"))))
+  (is (nil? (t/request-token "http://staging.startupdirectory.org/login"))))
 
 (deftest approval-url
   (let [request-token (result/value (t/request-token "http://staging.startupdirectory.org/login"))
