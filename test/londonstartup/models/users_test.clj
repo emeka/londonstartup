@@ -7,9 +7,6 @@
   (:use clojure.test)
   (import org.bson.types.ObjectId))
 
-
-
-
 ;; CRUD test
 (let [user1-id (ObjectId.)
       user2-id (ObjectId.)
