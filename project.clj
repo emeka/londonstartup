@@ -18,4 +18,5 @@
              :dev {:dependencies [[midje "1.5.1"]
                                   [ring-mock "0.1.5"]
                                   [org.slf4j/slf4j-nop "1.6.4"]]
-                   :plugins [[lein-embongo "0.2.1"]]}})
+                   :plugins [[lein-embongo "0.2.1"]
+                             [lein-midje "3.0.1"]]}})
