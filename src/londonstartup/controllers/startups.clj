@@ -5,15 +5,6 @@
             [londonstartup.common.result :as result])
   (import org.bson.types.ObjectId))
 
-(defn adapt-startup [startup]
-  (if-let [_id (:_id startup)]
-    (if (instance? ObjectId _id)
-      startup
-      (try
-        (assoc startup :_id (ObjectId. _id))
-        (catch Exception e (dissoc startup :_id))))
-    startup))
-
 
 ;;Read
 (defn startups [query]
@@ -27,15 +18,13 @@
 
 ;;Modify
 (defn startup-new [startup]
-  (let [startup (adapt-startup startup)
-        add-result (startup/add! startup)]
+  (let [add-result (startup/add! startup)]
     (if (not (result/has-error? add-result))
       (resp/redirect-after-post (str "/startups/" (:website startup)))
       (views/add-startup-page add-result))))
 
 (defn startup-update [startup & [default-website]]
-  (let [startup (adapt-startup startup)
-        update-result (startup/update! startup)]
+  (let [update-result (startup/update! startup)]
     (if (not (result/has-error? update-result))
       (resp/redirect-after-post (str "/startups/" (:website startup)))
       (views/update-startup-page update-result default-website))))

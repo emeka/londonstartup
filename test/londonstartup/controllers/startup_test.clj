@@ -1,4 +1,4 @@
-(ns londonstartup.handler-test
+(ns londonstartup.controllers.startup-test
   (:require [londonstartup.controllers.startups :as startups])
   (import org.bson.types.ObjectId)
   (:use midje.sweet)

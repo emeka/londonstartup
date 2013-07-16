@@ -74,9 +74,22 @@
 (defn user-logged? [req]
   (session/get :user ))
 
+(defn wrap-connect-db
+  "Middleware that will first check if a database connection exists and if not will try to connect.
+  This is to ensure that we retry database connect if needed."
+  [handler]
+  (fn [request]
+    (try
+      (do
+        (models/db-connect)
+        (handler request))
+      (catch Exception e
+        (handler (assoc request :connect-db-error (str (.getMessage e))))))))
+
 (def app
   ;;The first parameter of app-handler must be a sequence
   (nm/app-handler [app-routes] :access-rules [{:on-fail redirect-to-login :rules [user-logged?]}]))
 
 (defn init []
-  (models/initialize))
+  (try (models/db-connect)
+    (catch Exception e (str (.getMessage e)))))

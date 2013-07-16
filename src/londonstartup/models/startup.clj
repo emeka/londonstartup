@@ -8,7 +8,6 @@
 
 (def ^:dynamic collection "startups")
 
-
 ;; Validation
 (defn has-id? [startup]
   (let [id (:_id startup)]
@@ -54,6 +53,15 @@
 (defn startups []
   (result/result (mc/find-maps collection)))
 
+(defn convert-id [startup]
+  (if-let [_id (:_id startup)]
+    (if (instance? ObjectId _id)
+      (result/result startup)
+      (try
+        (result/result (assoc startup :_id (ObjectId. _id)))
+        (catch Exception e (dissoc startup :_id))))
+    (result/result startup)))
+
 (defn generate-id-if-needed [startup]
   (if (has-id? startup)
     (result/result startup)
@@ -64,6 +72,7 @@
 
 (defn add! [startup]
   (result/until-error-> startup
+    (convert-id)
     (valid?)
     (id-free?)
     (generate-id-if-needed)
@@ -89,6 +98,7 @@
 
 (defn update! [startup]
   (result/until-error-> startup
+    (convert-id)
     (valid?)
     (update-valid? (result/value (id->startup (:_id startup))))
     (update-raw!)))

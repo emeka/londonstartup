@@ -92,7 +92,10 @@
     "/js/application.js"))
 
 (defn debug []
-  (if env/debug? [:div.row.debug [:div {:class "span12"} (str @noir.session/*noir-session* "</br></br>" noir.request/*request*)]]))
+  (if env/debug? [:div.container-fluid.debug
+                  [:div.row-fluid [:div {:class "span12"} (str @noir.session/*noir-session*)]]
+                  [:div.row-fluid [:div {:class "span12"} (str noir.request/*request*)]]
+                  [:div.row-fluid [:div {:class "span12"} (str (System/getenv))]]]))
 
 (defhtml layout [& content]
   (let [split-navbar-config (split-with :navbar content)

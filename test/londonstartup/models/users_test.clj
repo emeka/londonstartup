@@ -20,7 +20,7 @@
 
   ;; Fixtures
   (defn init-db [f]
-    (models/initialize)
+    (models/db-connect)
     (binding [users/collection "usersTEST"]
       (f)))
 

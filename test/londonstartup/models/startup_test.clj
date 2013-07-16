@@ -17,7 +17,7 @@
 
   ;; Fixtures
   (defn init-db [f]
-    (models/initialize)
+    (models/db-connect)
     (binding [startup/collection "startupsTEST"]
       (f)))
 
@@ -58,6 +58,11 @@
     (is (not (result/has-error? (startup/id-free? {}))))
     (is (not (result/has-error? (startup/id-free? {:_id (ObjectId.)}))))
     (is (result/has-error? (startup/id-free? {:_id google-id}))))
+
+  (deftest adapt-startup
+    (is (instance? ObjectId (:_id (result/value (startup/convert-id {:_id "51ae0bfe300497063eabcfc5"})))))
+    (is (instance? ObjectId (:_id (result/value (startup/convert-id {:_id (ObjectId. "51ae0bfe300497063eabcfc5")})))))
+    (is (nil? (:_id (result/value (startup/convert-id {:_id ""}))))))
 
   (deftest startups
     (is (= (list google yahoo) (result/value (startup/startups)))))
