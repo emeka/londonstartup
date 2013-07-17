@@ -1,6 +1,7 @@
 (ns londonstartup.services.twitter
   (:require [oauth.client :as oauth]
             [londonstartup.common.result :as result]
+  [londonstartup.environment :as env]
             [clojure.data.json :as json])
   (:use [twitter.oauth]
         [twitter.callbacks]
@@ -10,9 +11,9 @@
 
 
 (def app-consumer-key "V4pHVpupNNtj0GYwcglzQ")
-(def app-consumer-secret (get (System/getenv) "TWITTER_APP_CONSUMER_SECRET"))
+(def app-consumer-secret (env/get "TWITTER_APP_CONSUMER_SECRET"))
 (def user-access-token "19400021-Aqbp1v1MmxMGiPEI8qUhOEfVHAGsoIXNXs8yGCvF4")
-(def user-access-token-secret (get (System/getenv) "TWITTER_ACCESS_TOKEN_SECRET"))
+(def user-access-token-secret (env/get "TWITTER_ACCESS_TOKEN_SECRET"))
 
 
 ;;Login
