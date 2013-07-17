@@ -4,6 +4,7 @@
 
 (defn get
   ([key] (get key nil))
-  ([key default] (clojure.core/get (System/getenv) key default)))
+  ([key default] (clojure.core/get (System/getenv) key
+                   (clojure.core/get (System/getProperties) key default))))
 
 (def debug? (= "true" (get "DEBUG")))
