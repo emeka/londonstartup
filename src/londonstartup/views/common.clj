@@ -109,20 +109,10 @@
        [:meta {:author "Emeka Mosanya"}]
        [:title "London Startup Directory"]
 
-       (include-css "http://twitter.github.io/bootstrap/assets/css/bootstrap.css")
-       (include-css "http://twitter.github.io/bootstrap/assets/css/bootstrap-responsive.css")
-       (include-css "http://twitter.github.io/bootstrap/assets/css/docs.css")
+       (include-css "/bootstrap/css/bootstrap.css")
+       (include-css "/bootstrap/css/bootstrap-responsive.css")
+       (include-css "/bootstrap/css/docs.css")
 
-       (include-css "/css/londonstartup.css")
-
-       [:link {:rel "apple-touch-icon-precomposed" :sizes "144x144"
-               :href "http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-144-precomposed.png"}]
-       [:link {:rel "apple-touch-icon-precomposed" :sizes "114x114"
-               :href "http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-114-precomposed.png"}]
-       [:link {:rel "apple-touch-icon-precomposed" :sizes "72x72"
-               :href "http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-72-precomposed.png"}]
-       [:link {:rel "apple-touch-icon-precomposed"
-               :href "http://twitter.github.io/bootstrap/assets/ico/apple-touch-icon-57-precomposed.png"}]
-       [:link {:rel "shortcut icon" :href "http://twitter.github.io/bootstrap/assets/ico/favicon.png"}]]
+       (include-css "/css/londonstartup.css")]
 
       [:body (navbar navbar-config) (flashbar) (debug) [:div#wrapper content] javascript])))
